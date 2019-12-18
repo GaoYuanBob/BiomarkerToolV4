@@ -6,3 +6,6 @@ for libtiff（安装libtiff之后生成）\
 &ensp;&ensp;jpeg.dll\
 &ensp;&ensp;libtiff.dll\
 &ensp;&ensp;zlib.dll
+
+## 参考资料
+1. Using the TIFF Library：http://www.libtiff.org/libtiff.html#Mman
