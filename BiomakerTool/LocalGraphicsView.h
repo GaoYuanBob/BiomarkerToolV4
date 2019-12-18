@@ -8,6 +8,8 @@
 #include "GraphicsRectItem.h"
 #include <QGraphicsPixmapItem>
 
+Q_DECLARE_METATYPE(QMouseEvent*);
+
 class LocalGraphicsView : public QGraphicsView
 {
 	Q_OBJECT
@@ -138,7 +140,7 @@ protected:
 		emit sendPenType(penIndex);
 		update();
 	}
-	public Q_SLOTS:
+	public slots:
 	void zoomIn();  // 放大
 	void zoomOut();  // 缩小
 	void zoom(float scaleFactor); // 缩放 - scaleFactor：缩放的比例因子

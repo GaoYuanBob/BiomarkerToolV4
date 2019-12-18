@@ -27,13 +27,13 @@ LabelTableModel::LabelTableModel(QObject *parent) :QAbstractTableModel(parent), 
 
 int LabelTableModel::rowCount(const QModelIndex & index) const
 {
-	Q_ASSERT_X(!index.isValid(), "LabelTableModel::setData", "Invalid index");
+	//Q_ASSERT_X(!index.isValid(), "LabelTableModel::setData", "Invalid index");
 	return modelData.count();
 }
 
 int LabelTableModel::columnCount(const QModelIndex & index) const
 {
-	Q_ASSERT_X(!index.isValid(), "LabelTableModel::setData", "Invalid index");
+	//Q_ASSERT_X(!index.isValid(), "LabelTableModel::setData", "Invalid index");
 	return 1;
 }
 
@@ -104,7 +104,7 @@ bool LabelTableModel::setData(const QModelIndex& index, const QVariant& value, i
 
 QModelIndex LabelTableModel::index(int row, int column, const QModelIndex& parent) const
 {
-	Q_ASSERT_X(!parent.isValid(), "LabelTableModel::setData", "Invalid index");
+	//Q_ASSERT_X(!parent.isValid(), "LabelTableModel::setData", "Invalid index");
 	if (modelData.empty())
 	{
 		qDebug() << createIndex(row, column, nullptr);
@@ -125,7 +125,7 @@ Qt::ItemFlags LabelTableModel::flags(const QModelIndex& index) const
 
 bool LabelTableModel::insertRows(int row, int count, const QModelIndex &parent)
 {
-	Q_ASSERT_X(!parent.isValid(), "LabelTableModel::setData", "Invalid index");
+	//Q_ASSERT_X(!parent.isValid(), "LabelTableModel::setData", "Invalid index");
 	beginInsertRows(parent, row, row + count);
 	for(int i = 0 ; i<count;i++)
 	{
@@ -137,7 +137,7 @@ bool LabelTableModel::insertRows(int row, int count, const QModelIndex &parent)
 
 bool LabelTableModel::insertColumns(int columns, int count, const QModelIndex &parent)
 {
-	Q_ASSERT_X(!parent.isValid(), "LabelTableModel::setData", "Invalid index");
+	//Q_ASSERT_X(!parent.isValid(), "LabelTableModel::setData", "Invalid index");
 	beginInsertColumns(parent, columns, columns + count);
 	for(auto & item:modelData)
 	{
@@ -149,7 +149,7 @@ bool LabelTableModel::insertColumns(int columns, int count, const QModelIndex &p
 
 bool LabelTableModel::removeRows(int row, int count, const QModelIndex &parent)
 {
-	Q_ASSERT_X(!parent.isValid(), "LabelTableModel::setData", "Invalid index");
+	//Q_ASSERT_X(!parent.isValid(), "LabelTableModel::setData", "Invalid index");
 
 	const auto beginIndex = std::min(row, modelData.size());
 	const auto endIndex = std::min(row + count, modelData.size());
@@ -169,7 +169,7 @@ bool LabelTableModel::removeRows(int row, int count, const QModelIndex &parent)
 
 bool LabelTableModel::removeColumns(int columns, int count, const QModelIndex &parent)
 {
-	Q_ASSERT_X(!parent.isValid(), "LabelTableModel::setData", "Invalid index");
+	//Q_ASSERT_X(!parent.isValid(), "LabelTableModel::setData", "Invalid index");
 	bool success = false;
 
 	beginRemoveColumns(parent, columns, columns + count);

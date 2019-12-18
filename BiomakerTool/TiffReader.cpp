@@ -5,7 +5,6 @@
 #include <stdio.h>
 #include <string.h>
 
-
 TiffReader::TiffReader(QString filename)
 {
 	tif = TIFFOpen(filename.toStdString().c_str(), "r");
@@ -34,6 +33,9 @@ TiffReader::TiffReader(QString filename)
 
 		TIFFGetField(tif, TIFFTAG_PLANARCONFIG, &imagePlanarConfig);
 		TIFFGetField(tif, TIFFTAG_ORIENTATION, &Orientation);
+
+		qDebug() << "imagePlanarConfig = " << imagePlanarConfig;
+		qDebug() << "Orientation = " << Orientation;
 
 		long long stripSize = TIFFStripSize(tif);
 		long long StripsNumber = TIFFNumberOfStrips(tif);
