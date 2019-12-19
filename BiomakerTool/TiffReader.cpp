@@ -14,15 +14,15 @@ TiffReader::TiffReader(QString filename)
 	if (tif) {
 		TIFFGetField(tif, TIFFTAG_IMAGEWIDTH, &imageWidth);
 		TIFFGetField(tif, TIFFTAG_IMAGELENGTH, &imageLength);
-		//qDebug() << "Image width and length" << imageWidth << imageLength;
+		qDebug() << "Image width and length: " << imageWidth << " " << imageLength;
+		qDebug() << "Image width * length = " << imageWidth * imageLength;
 		TIFFGetField(tif, TIFFTAG_BITSPERSAMPLE, &bps);
 		TIFFGetField(tif, TIFFTAG_COMPRESSION, &imageCompression);
 		TIFFGetField(tif, TIFFTAG_PHOTOMETRIC, &imagePhotoMetric);
 
 		TIFFGetField(tif, TIFFTAG_SAMPLESPERPIXEL, &imageSamplePerPixel);
 		TIFFGetField(tif, TIFFTAG_ROWSPERSTRIP, &imageRowsPerStrip);
-		if (imageRowsPerStrip != 1)
-		{
+		if (imageRowsPerStrip != 1) {
 			qDebug("Rows Each Strip Is Not 1!");
 			//return;
 		}
@@ -40,7 +40,6 @@ TiffReader::TiffReader(QString filename)
 		long long stripSize = TIFFStripSize(tif);
 		long long StripsNumber = TIFFNumberOfStrips(tif);
 
-		qDebug() << "Image width and length" << imageWidth << imageLength;
 		qDebug() << "bps" << bps;
 		qDebug() << "imageCompression" << imageCompression;
 		qDebug() << "imagePhotoMetric" << imagePhotoMetric;
@@ -54,8 +53,6 @@ TiffReader::TiffReader(QString filename)
 		qDebug() << "stripSize" << stripSize;
 		qDebug() << "StripsNumber" << StripsNumber;
 
-
-
 		raster = (uint32*)_TIFFmalloc(imageWidth*imageLength * sizeof(uint32)); // 分配适当格式的内存
 		if (raster != NULL) {
 			qDebug() << "Get image end.";
@@ -68,8 +65,8 @@ TiffReader::TiffReader(QString filename)
 			//_TIFFfree(raster); // 释放内存
 		}
 	}
-	
 }
+
 TiffReader::~TiffReader() {
 	//_TIFFfree(raster);
 	//delete tif;
@@ -84,7 +81,36 @@ uint32 TiffReader::getWidth() {
 uint32 TiffReader::getHeight() {
 	return this->imageLength;
 }
+
 uint32* TiffReader::getLocalImage(QPointF startPoint, int sceneHeight, int sceneWidth) {
+	if (imageCompression != 1) {
+		if (imageCompression == 7) {
+			qDebug() << "图像压缩方式为7：new JPEG";
+			if (tif) {
+				uint32 imagelength;
+				tdata_t buf;
+				uint32 row;
+
+				TIFFGetField(tif, TIFFTAG_IMAGELENGTH, &imagelength);
+				qDebug() << "imagelength: " << imagelength;
+
+				qDebug() << "TIFFScanlineSize: " << TIFFScanlineSize(tif);
+				// TIFFScanlineSize(tif): the number of bytes in a decoded scanline
+				// imageWidth: image width
+				// TIFFScanlineSize(tif) / imageWidth: bytes for one point?
+				qDebug() << TIFFScanlineSize(tif) / imageWidth; // 3, 一个像素三字节
+
+
+				buf = _TIFFmalloc(TIFFScanlineSize(tif));
+				for (row = 0; row < imagelength; row++)
+					TIFFReadScanline(tif, buf, row);
+				_TIFFfree(buf);
+				//TIFFClose(tif);
+			}
+		}
+		return 0;
+	};	// 
+
 
 	if (imageData) {
 		free(imageData);
@@ -106,9 +132,7 @@ uint32* TiffReader::getLocalImage(QPointF startPoint, int sceneHeight, int scene
 	//if (buf) {
 	//	free(buf);
 	//}
-
 	
-
 	int localStartRow = 0, localEndRow = 0;
 	int curIndex = sceneHeight-1;
 	for (strip = realStripStart; strip <= realStripEnd; strip++) {

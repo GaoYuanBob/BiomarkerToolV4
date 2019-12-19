@@ -53,7 +53,7 @@
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
       <AdditionalLibraryDirectories>$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>tiffd.lib;qtmaind.lib;Qt53DCored.lib;Qt53DAnimationd.lib;Qt53DExtrasd.lib;Qt53DInputd.lib;Qt53DLogicd.lib;Qt53DRenderd.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5OpenGLd.lib;opengl32.lib;glu32.lib;Qt5OpenGLExtensionsd.lib;Qt5Widgetsd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libtiffd.lib;qtmaind.lib;Qt53DCored.lib;Qt53DAnimationd.lib;Qt53DExtrasd.lib;Qt53DInputd.lib;Qt53DLogicd.lib;Qt53DRenderd.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5OpenGLd.lib;opengl32.lib;glu32.lib;Qt5OpenGLExtensionsd.lib;Qt5Widgetsd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
