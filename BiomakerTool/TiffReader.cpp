@@ -5,8 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 
-TiffReader::TiffReader(QString filename)
-{
+TiffReader::TiffReader(QString filename) {
 	tif = TIFFOpen(filename.toStdString().c_str(), "r");
 	
 	navigationData = nullptr;
@@ -14,32 +13,32 @@ TiffReader::TiffReader(QString filename)
 	if (tif) {
 		TIFFGetField(tif, TIFFTAG_IMAGEWIDTH, &imageWidth);
 		TIFFGetField(tif, TIFFTAG_IMAGELENGTH, &imageLength);
-		qDebug() << "Image width and length: " << imageWidth << " " << imageLength;
-		qDebug() << "Image width * length = " << imageWidth * imageLength;
 		TIFFGetField(tif, TIFFTAG_BITSPERSAMPLE, &bps);
 		TIFFGetField(tif, TIFFTAG_COMPRESSION, &imageCompression);
 		TIFFGetField(tif, TIFFTAG_PHOTOMETRIC, &imagePhotoMetric);
-
 		TIFFGetField(tif, TIFFTAG_SAMPLESPERPIXEL, &imageSamplePerPixel);
 		TIFFGetField(tif, TIFFTAG_ROWSPERSTRIP, &imageRowsPerStrip);
+		TIFFGetField(tif, TIFFTAG_XRESOLUTION, &X_Resolut);
+		TIFFGetField(tif, TIFFTAG_YRESOLUTION, &Y_Resolut);
+		TIFFGetField(tif, TIFFTAG_RESOLUTIONUNIT, &ResolutUnit);
+		TIFFGetField(tif, TIFFTAG_PLANARCONFIG, &imagePlanarConfig);
+		TIFFGetField(tif, TIFFTAG_ORIENTATION, &Orientation);
+
+		// 目前好像只能读取非压缩的数据，即imageCompression = 1
+		if (imageCompression != 1) {
+			qDebug("imageCompression != 1!");
+			//exit(-1);
+		}
 		if (imageRowsPerStrip != 1) {
 			qDebug("Rows Each Strip Is Not 1!");
 			//return;
 		}
 
-		TIFFGetField(tif, TIFFTAG_XRESOLUTION, &X_Resolut);
-		TIFFGetField(tif, TIFFTAG_YRESOLUTION, &Y_Resolut);
-		TIFFGetField(tif, TIFFTAG_RESOLUTIONUNIT, &ResolutUnit);
-
-		TIFFGetField(tif, TIFFTAG_PLANARCONFIG, &imagePlanarConfig);
-		TIFFGetField(tif, TIFFTAG_ORIENTATION, &Orientation);
+		qDebug() << "Image width and length: " << imageWidth << " " << imageLength;
+		qDebug() << "Image width * length = " << imageWidth * imageLength;
 
 		qDebug() << "imagePlanarConfig = " << imagePlanarConfig;
 		qDebug() << "Orientation = " << Orientation;
-
-		long long stripSize = TIFFStripSize(tif);
-		long long StripsNumber = TIFFNumberOfStrips(tif);
-
 		qDebug() << "bps" << bps;
 		qDebug() << "imageCompression" << imageCompression;
 		qDebug() << "imagePhotoMetric" << imagePhotoMetric;
@@ -50,8 +49,8 @@ TiffReader::TiffReader(QString filename)
 		qDebug() << "ResolutUnit" << ResolutUnit;
 		qDebug() << "imagePlanarConfig" << imagePlanarConfig;
 		qDebug() << "Orientation" << Orientation;
-		qDebug() << "stripSize" << stripSize;
-		qDebug() << "StripsNumber" << StripsNumber;
+		qDebug() << "stripSize" << TIFFStripSize(tif);
+		qDebug() << "Number of Strips: " << TIFFNumberOfStrips(tif);
 
 		raster = (uint32*)_TIFFmalloc(imageWidth*imageLength * sizeof(uint32)); // 分配适当格式的内存
 		if (raster != NULL) {
@@ -83,38 +82,8 @@ uint32 TiffReader::getHeight() {
 }
 
 uint32* TiffReader::getLocalImage(QPointF startPoint, int sceneHeight, int sceneWidth) {
-	if (imageCompression != 1) {
-		if (imageCompression == 7) {
-			qDebug() << "图像压缩方式为7：new JPEG";
-			if (tif) {
-				uint32 imagelength;
-				tdata_t buf;
-				uint32 row;
-
-				TIFFGetField(tif, TIFFTAG_IMAGELENGTH, &imagelength);
-				qDebug() << "imagelength: " << imagelength;
-
-				qDebug() << "TIFFScanlineSize: " << TIFFScanlineSize(tif);
-				// TIFFScanlineSize(tif): the number of bytes in a decoded scanline
-				// imageWidth: image width
-				// TIFFScanlineSize(tif) / imageWidth: bytes for one point?
-				qDebug() << TIFFScanlineSize(tif) / imageWidth; // 3, 一个像素三字节
-
-
-				buf = _TIFFmalloc(TIFFScanlineSize(tif));
-				for (row = 0; row < imagelength; row++)
-					TIFFReadScanline(tif, buf, row);
-				_TIFFfree(buf);
-				//TIFFClose(tif);
-			}
-		}
-		return 0;
-	};	// 
-
-
-	if (imageData) {
+	if (imageData)
 		free(imageData);
-	}
 	imageData = (uint32*)malloc((int)sceneHeight*(int)sceneWidth* sizeof(uint32));
 
 	//1. find the row range from start to end
