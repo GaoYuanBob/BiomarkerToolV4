@@ -1,11 +1,10 @@
 #pragma once
+#include "tiffio.h"
 #include <QString>
-#include <tiffio.h>
 #include <iostream>
 #include <QImage>
 
-class TiffReader
-{
+class TiffReader {
 public:
 	TiffReader(QString filename);
 	~TiffReader();
@@ -19,10 +18,7 @@ public:
 	uint32* getGlobalGraphicsImage(int sceneHeight, int sceneWidth);
 	//Debug 20190728
 	double getGlobalFactor() const { return global_factor; }
-
-	
 	double getGlobalWidthFactor() const { return global_width_factor; }
-	
 	double getGlobalHeightFactor() const { return global_height_factor; }
 private:
 	TIFF* tif;
@@ -43,4 +39,3 @@ private:
 	double global_factor;
 	double global_width_factor; double global_height_factor;
 };
-
