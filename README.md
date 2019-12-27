@@ -1,6 +1,7 @@
 # BiomarkerTool-V4
-海马体标注工具，读取TIFF（.tif / .tiff）数据并进行标注。也可读取之前的标注等信息。
-使用 VS2017 + Qt-5.12 编写。
+海马体标注工具，读取TIFF（.tif / .tiff）数据并进行标注。也可读取之前的标注等信息。\
+使用 VS2017 + Qt-5.12 编写。\
+需要安装TIFF的库，在VS中的 "工具" --> "NuGet包管理器" --> "管理解决方案的NuGet程序包" 中安装 **"libtiff"**。
 
 ## 操作方法
 分为LocalView和GlobalView；\
