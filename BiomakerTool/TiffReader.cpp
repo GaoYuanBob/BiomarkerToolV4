@@ -86,6 +86,8 @@ uint32* TiffReader::getLocalImage(QPointF startPoint, int sceneHeight, int scene
 		free(imageData);
 	imageData = static_cast<uint32*>(malloc(sceneHeight * sceneWidth * sizeof(uint32)));
 
+	qDebug() << "Position of startPoint: " << startPoint;
+	
 	//1. find the row range from start to end
 	int realStartRow = 0, realEndRow = 0;
 	startPoint.setY(imageLength - startPoint.y()- sceneHeight);
@@ -95,9 +97,16 @@ uint32* TiffReader::getLocalImage(QPointF startPoint, int sceneHeight, int scene
 	const int realStripStart = realStartRow / imageRowsPerStrip;
 	const int realStripEnd = realEndRow / imageRowsPerStrip;
 
-	const int startStripRow = realStartRow % imageRowsPerStrip;
-	const int endStripRow = realEndRow % imageRowsPerStrip;
+	const int startStripRow = realStartRow % (int)imageRowsPerStrip;
+	const int endStripRow = realEndRow % (int)imageRowsPerStrip;
 
+	printf("\nrealStartRow = %d\n", realStartRow);
+	printf("realEndRow = %d\n", realEndRow);
+	printf("realStripStart = %d\n", realStripStart);
+	printf("realStripEnd = %d\n", realStripEnd);
+	printf("startStripRow = %d\n", startStripRow);
+	printf("endStripRow = %d\n\n", endStripRow);
+	
 	int localStartRow = 0, localEndRow = 0;
 	int curIndex = sceneHeight - 1;
 	for (strip = realStripStart; strip <= realStripEnd; strip++) {
@@ -106,7 +115,7 @@ uint32* TiffReader::getLocalImage(QPointF startPoint, int sceneHeight, int scene
 		localStartRow = (strip == realStripStart) ? startStripRow : 0;
 		localEndRow = (strip == realStripEnd) ? endStripRow : (imageRowsPerStrip - 1);
 		
-		for (int i = localStartRow; i <=localEndRow; i++) {
+		for (int i = localStartRow; i <= localEndRow; i++) {
 			if (curIndex < 0) {
 				free(buf);
 				return imageData;

@@ -1458,11 +1458,11 @@ void BiomakerTool::on_slotOpenImage_triggered(){
 	
 	setNavigationBackground();
 
-
 	bufImg = new QImage(sceneWidth, sceneHeight, QImage::Format_RGB32);
 	
 	QPoint centerPoint = QPoint(tiffWidth / 2 - 1, tiffHeight / 2 - 1);
 	QPoint startPoint = centerPoint - QPoint(sceneWidth / 2 - 1, sceneHeight / 2 - 1);
+	
 	setShowImage(startPoint);
 
 	//set global view
@@ -1475,7 +1475,7 @@ void BiomakerTool::on_slotOpenImage_triggered(){
 void BiomakerTool::setShowImage(QPointF startPoint) {
 
 	//QImage *testImage = new QImage(sceneWidth, sceneHeight, QImage::Format_RGB32);
-
+	// startPoint 为绘制窗口左上角，在tiff图像中的位置
 	uint32* testData = tiffReader->getLocalImage(startPoint, sceneHeight, sceneWidth);
 	for (tstrip_t i = 0; i < sceneHeight; i++) {
 		for (tstrip_t j = 0; j < sceneWidth; j++) {
