@@ -1,15 +1,12 @@
 #include "GlobalGraphicsView.h"
-#include <iostream>
+#include "PloygonArea.h"
 #include "GraphicsRectItem.h"
+
+#include <iostream>
 #include <QGraphicsItem>
 #include <QDebug>
-#include "PloygonArea.h"
 
-
-
-GlobalGraphicsView::GlobalGraphicsView(QWidget *parent)
-	: QGraphicsView(parent)
-{
+GlobalGraphicsView::GlobalGraphicsView(QWidget *parent) : QGraphicsView(parent) {
 	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	setRenderHint(QPainter::Antialiasing);
@@ -31,14 +28,9 @@ GlobalGraphicsView::GlobalGraphicsView(QWidget *parent)
 	selected_ploygon = nullptr;
 
 	circle_number_map.clear();
-
 }
 
-GlobalGraphicsView::~GlobalGraphicsView()
-= default;
-
-void GlobalGraphicsView::updateImage(QPixmap& pixmap)
-{
+void GlobalGraphicsView::updateImage(QPixmap& pixmap) {
 	setSceneRect(0, 0, width(), height());
 	graphicsScene->setSceneRect(0, 0, width(), height());
 	graphicsScene->setBackgroundBrush(QBrush(Qt::white));
@@ -48,8 +40,8 @@ void GlobalGraphicsView::updateImage(QPixmap& pixmap)
 	graphicsScene->update();
 	//pixmapItem->setZValue(minZvalue);
 }
-void GlobalGraphicsView::updateRects(QList<QGraphicsItem*>& items, double factor)
-{
+
+void GlobalGraphicsView::updateRects(QList<QGraphicsItem*>& items, double factor) {
 	//erase all ellipse items
 	for (auto& i : graphicsScene->items())
 	{
@@ -111,7 +103,6 @@ void GlobalGraphicsView::updateRects(QList<QGraphicsItem*>& items, double width_
 	this->height_factor = height_factor;
 	graphicsScene->update();
 }
-
 
 void GlobalGraphicsView::mouseMoveEvent(QMouseEvent *event)
 {
@@ -680,7 +671,6 @@ void GlobalGraphicsView::setSelectedItem(QGraphicsEllipseItem* item)
 	selected_circle->setPen(redDotPen);
 }
 
-
 void GlobalGraphicsView::setSelectedItem(QGraphicsPathItem* item)
 {
 	if (selected_circle)
@@ -782,6 +772,7 @@ void GlobalGraphicsView::getLocalPolygon(const QVector<QPointF>& vector, QGraphi
 	//std::cout << "test" << endl;
 
 }
+
 QGraphicsPathItem* GlobalGraphicsView::getCurPolgyon() const
 {
 	return cur_ploygon;

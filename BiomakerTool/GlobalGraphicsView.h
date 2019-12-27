@@ -8,7 +8,7 @@ class GlobalGraphicsView : public QGraphicsView
 
 public:
 	GlobalGraphicsView(QWidget *parent = nullptr);
-	~GlobalGraphicsView();
+	~GlobalGraphicsView() = default;
 
 	void updateImage(QPixmap& pixmap);
 	void updateRects(QList<QGraphicsItem*>& items, double factor);
