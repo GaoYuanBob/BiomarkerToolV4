@@ -1,8 +1,5 @@
 #include "NavigationMinItem.h"
 
-NavigationMinItem::NavigationMinItem(){
-
-}
 NavigationMinItem::NavigationMinItem(QRectF boundingBox, QPointF startPoint, int sliderRecWidth, int sliderRecHeight)
 {
 	this->boundingBox = boundingBox;
@@ -12,7 +9,6 @@ NavigationMinItem::NavigationMinItem(QRectF boundingBox, QPointF startPoint, int
 	currentBox = QRectF(startPoint, QSize(sliderRecWidth, sliderRecHeight));
 	offset = QPointF(-sliderRecWidth / 2, -sliderRecHeight / 2);
 	startPoint += offset;
-
 }
 
 void NavigationMinItem::setShowNavigationMinWindow(QPoint globalPoint) {

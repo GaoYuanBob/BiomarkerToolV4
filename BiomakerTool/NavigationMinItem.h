@@ -9,7 +9,7 @@ class NavigationMinItem : public QObject, public QGraphicsItem
 {
 	Q_OBJECT
 public:
-	NavigationMinItem();
+	NavigationMinItem() = default;
 	NavigationMinItem(QRectF boundingBox, QPointF startPoint, int sliderRecWidth, int sliderRecHeight);
 	void setFactor(float factor) {
 		this->factor = factor;
