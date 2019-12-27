@@ -1488,8 +1488,8 @@ void BiomakerTool::setShowImage(QPointF startPoint) {
 	//qDebug() << starttime.elapsed() << endl;
 	local_graphics_view->updateImage(startPoint.toPoint(), QPixmap::fromImage(swapImage));
 	local_graphics_view->show();
-
 }
+
 void BiomakerTool::setNavigationChoosedImage(QPointF localPoint) {
 
 	//this startPoint represents the navigation choosed local index, which need to be transformed into global index.

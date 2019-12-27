@@ -84,7 +84,7 @@ uint32 TiffReader::getHeight() {
 uint32* TiffReader::getLocalImage(QPointF startPoint, int sceneHeight, int sceneWidth) {
 	if (imageData)
 		free(imageData);
-	imageData = (uint32*)malloc((int)sceneHeight*(int)sceneWidth* sizeof(uint32));
+	imageData = static_cast<uint32*>(malloc(sceneHeight * sceneWidth * sizeof(uint32)));
 
 	//1. find the row range from start to end
 	int realStartRow = 0, realEndRow = 0;
@@ -92,33 +92,20 @@ uint32* TiffReader::getLocalImage(QPointF startPoint, int sceneHeight, int scene
 	//startPoint.setY(imageLength - startPoint.y());
 	realStartRow = startPoint.y();
 	realEndRow = startPoint.y() + sceneHeight;
-	int realStripStart = realStartRow / imageRowsPerStrip;
-	int realStripEnd = realEndRow / imageRowsPerStrip;
+	const int realStripStart = realStartRow / imageRowsPerStrip;
+	const int realStripEnd = realEndRow / imageRowsPerStrip;
 
-	int startStripRow = realStartRow%imageRowsPerStrip;
-	int endStripRow = realEndRow%imageRowsPerStrip;
+	const int startStripRow = realStartRow % imageRowsPerStrip;
+	const int endStripRow = realEndRow % imageRowsPerStrip;
 
-	//if (buf) {
-	//	free(buf);
-	//}
-	
 	int localStartRow = 0, localEndRow = 0;
-	int curIndex = sceneHeight-1;
+	int curIndex = sceneHeight - 1;
 	for (strip = realStripStart; strip <= realStripEnd; strip++) {
-		buf = (unsigned char *)malloc(stripeSize);
-		TIFFReadEncodedStrip(tif, strip, buf, (tsize_t)-1);
-		if (strip == realStripStart) {
-			localStartRow = startStripRow;
-		}
-		else {
-			localStartRow = 0;
-		}
-		if (strip == realStripEnd) {
-			localEndRow = endStripRow;
-		}
-		else {
-			localEndRow = imageRowsPerStrip-1;
-		}
+		buf = static_cast<unsigned char *>(malloc(stripeSize));
+		TIFFReadEncodedStrip(tif, strip, buf, static_cast<tsize_t>(-1));
+		localStartRow = (strip == realStripStart) ? startStripRow : 0;
+		localEndRow = (strip == realStripEnd) ? endStripRow : (imageRowsPerStrip - 1);
+		
 		for (int i = localStartRow; i <=localEndRow; i++) {
 			if (curIndex < 0) {
 				free(buf);
@@ -136,7 +123,6 @@ uint32* TiffReader::getLocalImage(QPointF startPoint, int sceneHeight, int scene
 	}
 	
 	return imageData;
-
 }
 
 uint32* TiffReader::getGlobalGraphicsImage()

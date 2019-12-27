@@ -11,13 +11,12 @@
 
 Q_DECLARE_METATYPE(QMouseEvent*);
 
-class LocalGraphicsView : public QGraphicsView
-{
+class LocalGraphicsView : public QGraphicsView {
 	Q_OBJECT
 
 public:
-	LocalGraphicsView( QWidget *parent = nullptr);
-	~LocalGraphicsView();
+	LocalGraphicsView(QWidget *parent = nullptr);
+	~LocalGraphicsView() = default;
 	void updateImage(QPoint startPoint, QPixmap& pixmap);
 	void setRectLoadedState(bool state);
 	void setRectSelectedState(GraphicsRectItem* rect_item);
@@ -35,7 +34,7 @@ public:
 	}
 	
 	QPen& getOldDotPen(GraphicsRectItem* item) {
-		QPen oldPen = item->pen();
+		const QPen oldPen = item->pen();
 		if (oldPen.color() == Qt::red)	  return this->redDotPen;
 		if (oldPen.color() == Qt::green)  return this->greenDotPen;
 		if (oldPen.color() == Qt::blue)   return this->blueDotPen;
@@ -44,7 +43,7 @@ public:
 	}
 	
 	QPen& getOldPen(GraphicsRectItem* item) {
-		QPen oldPen = item->pen();
+		const QPen oldPen = item->pen();
 		if (oldPen.color() == Qt::red)    return this->redPen;
 		if (oldPen.color() == Qt::green)  return this->greenPen;
 		if (oldPen.color() == Qt::blue)   return this->bluePen;

@@ -1,17 +1,13 @@
 #include "LocalGraphicsView.h"
 #include <iostream>
 
-LocalGraphicsView::LocalGraphicsView( QWidget *parent)
-	: QGraphicsView(parent)
-{
+LocalGraphicsView::LocalGraphicsView( QWidget *parent) : QGraphicsView(parent) {
 	//this->startPoint = QPoint(tiffWidth / 2 - 1, tiffHeight / 2 - 1);
 	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	//setCursor(Qt::PointingHandCursor);
 	setRenderHint(QPainter::Antialiasing);
 
-	//setSceneRect(INT_MIN / 2, INT_MIN / 2, INT_MAX, INT_MAX);
-	//centerOn(0, 0);
 	oldPoint = QPoint(0, 0);
 	graphicsScene = new QGraphicsScene();
 	rectTopLeft = QPoint(0, 0);
@@ -19,7 +15,6 @@ LocalGraphicsView::LocalGraphicsView( QWidget *parent)
 	isZoomIn = false;
 	oldBuf = QPoint(0, 0);
 	setScene(graphicsScene);
-	
 
 	redLabelNumber = 0;
 	greenLabelNumber = 0;
@@ -40,11 +35,10 @@ LocalGraphicsView::LocalGraphicsView( QWidget *parent)
 	yellowDotPen = QPen(Qt::yellow, 1.5, Qt::DotLine, Qt::FlatCap);
 	blackDotPen = QPen(Qt::black, 1.5, Qt::DotLine, Qt::FlatCap);
 
-
 	selected_circle = nullptr;
+	selected_ploygon = nullptr;
 	cur_circle = nullptr;
 	cur_ploygon = nullptr;
-	selected_ploygon = nullptr;
 }
 
 void LocalGraphicsView::setTiffSize(int tiffWidth, int tiffHeight, int sceneWidth, int sceneHeight) {
@@ -69,6 +63,7 @@ void LocalGraphicsView::setStartPoint(const QPointF& start_point)
 	//this->startPoint = start_point.toPoint();
 	emit startPointChanged(start_point);
 }
+
 void LocalGraphicsView::updateImage(QPoint startP, QPixmap& pixmap) {
 
 	//oldStartPoint = startP;
@@ -155,10 +150,6 @@ void LocalGraphicsView::setRectSelectedState(GraphicsRectItem* rect_item)
 	selectedRectItem = rect_item;
 	isRectSeleted = true;
 	qDebug() << "rect number :" << cnt;
-}
-
-LocalGraphicsView::~LocalGraphicsView()
-{
 }
 
 bool LocalGraphicsView::inBoundingBox(QPoint startPos) {
