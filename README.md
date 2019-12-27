@@ -1,5 +1,6 @@
 # BiomarkerTool-V4
 海马体标注工具，读取TIFF（.tif / .tiff）数据并进行标注。也可读取之前的标注等信息。
+使用 VS2017 + Qt-5.12 编写。
 
 ## 操作方法
 分为LocalView和GlobalView；\
