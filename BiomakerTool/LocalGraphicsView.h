@@ -190,7 +190,7 @@ protected:
 private:
 	Qt::MouseButton m_translateButton;  // 平移按钮
 	qreal m_translateSpeed;  // 平移速度
-	qreal m_zoomDelta;  // 缩放的增量
+	qreal m_zoomDelta = 0.1;  // 缩放的增量
 	bool m_bMouseTranslate;  // 平移标识
 	QPoint m_lastMousePos;  // 鼠标最后按下的位置
 	qreal m_scale;  // 缩放值

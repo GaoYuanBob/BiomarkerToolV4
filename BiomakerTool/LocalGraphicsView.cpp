@@ -190,11 +190,11 @@ void LocalGraphicsView::keyPressEvent(QKeyEvent *event)
 		//translate(QPointF(2, 0));  // 右移
 		moveOffset = QPoint(xOffset, 0);
 		break;
-	case Qt::Key_Plus:  // 放大
-		//zoomIn();
+	case Qt::Key_Plus:  // 放大	键盘 'shift' + '+'
+		zoomIn();
 		break;
-	case Qt::Key_Minus:  // 缩小
-		//zoomOut();
+	case Qt::Key_Minus:  // 缩小 键盘 '-'
+		zoomOut();
 		break;
 	case Qt::Key_Space:  // 逆时针旋转
 		//rotate(-5);
@@ -696,21 +696,21 @@ void LocalGraphicsView::wheelEvent(QWheelEvent *event)
 // 放大
 void LocalGraphicsView::zoomIn()
 {
-	return;
+	//return;
 	zoom(1 + m_zoomDelta);
 }
 
 // 缩小
 void LocalGraphicsView::zoomOut()
 {
-	return;
+	//return;
 	zoom(1 - m_zoomDelta);
 }
 
 // 缩放 - scaleFactor：缩放的比例因子
 void LocalGraphicsView::zoom(float scaleFactor)
 {
-	return;
+	//return;
 	// 防止过小或过大
 	qreal factor = transform().scale(scaleFactor, scaleFactor).mapRect(QRectF(0, 0, 1, 1)).width();
 	if (factor < 0.07 || factor > 100)
