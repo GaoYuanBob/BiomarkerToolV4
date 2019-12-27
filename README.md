@@ -1,11 +1,11 @@
-# Biomarker-Tool-V4
+# BiomarkerTool-V4
 海马体标注工具，读取TIFF（.tif / .tiff）数据并进行标注。也可读取之前的标注等信息。
 
 ## 操作方法
 分为LocalView和GlobalView；\
 LocalView下：\
-&emsp;&emsp;可以使用加减号进行缩放，`'shift'` + `'+'` 可以进行放大，`'-'` 进行缩小。\
-&emsp;&emsp;
+&emsp;&emsp;可以使用加减号进行缩放，`'shift'` + `'+'` 可以进行放大，`'-'` 进行缩小。（这个功能目前有问题）\
+&emsp;&emsp;Zoomin 和 Zoomout 功能可以实现方法两倍和还原功能。（这个功能正常）
 
 GloabalView下：\
 &emsp;&emsp;目前没有缩放功能。
