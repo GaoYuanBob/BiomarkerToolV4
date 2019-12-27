@@ -7,15 +7,15 @@
 #include<QMouseEvent>
 #include <QDebug>
 #include <QKeyEvent>
-class CaptureGraphicsItem : public QObject, public QGraphicsItem
-{
+class CaptureGraphicsItem : public QObject, public QGraphicsItem {
 	//Q_OBJECT
-
+	
 public:
 	CaptureGraphicsItem(int sceneWidth,int sceneHeight, QPoint startPoint, QObject* object = nullptr);
-	~CaptureGraphicsItem();
+	~CaptureGraphicsItem() = default;
 	void setStartPoint(QPoint startPoint);
 	QRectF boundingRect() const;
+	
 protected:
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,QWidget *widget) Q_DECL_OVERRIDE;
 	void mousePressEvent(QGraphicsSceneMouseEvent *event) Q_DECL_OVERRIDE;
@@ -37,6 +37,7 @@ protected:
 	bool isRectSeleted;
 	int seletedRectIndex;
 	QRect selectedRect;
+	
 public:
 	static QVector<QRect> captureRects;
 	static int loadedNum;

@@ -271,8 +271,6 @@ private:
 	QPointF old_top_left;
 	QPointF old_point;
 
-
-
 	//Debug 20190726
 	bool is_region_painting_set = false;
 	QVector<QPointF> polygon_region;

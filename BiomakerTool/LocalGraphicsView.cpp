@@ -191,10 +191,10 @@ void LocalGraphicsView::keyPressEvent(QKeyEvent *event)
 		moveOffset = QPoint(xOffset, 0);
 		break;
 	case Qt::Key_Plus:  // 放大	键盘 'shift' + '+'
-		zoomIn();
+		//zoomIn();
 		break;
 	case Qt::Key_Minus:  // 缩小 键盘 '-'
-		zoomOut();
+		//zoomOut();
 		break;
 	case Qt::Key_Space:  // 逆时针旋转
 		//rotate(-5);
@@ -604,7 +604,6 @@ void LocalGraphicsView::mousePressEvent(QMouseEvent *event) {
 			}
 		}
 	}
-
 
 	//交互
 	if (is_region_painting_set)

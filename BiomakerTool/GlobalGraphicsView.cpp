@@ -126,8 +126,8 @@ void GlobalGraphicsView::mousePressEvent(QMouseEvent *event)
 		{
 			circleMousePressEvent(event);
 		}
-		else
-		{
+		else {
+			// 画任意形状
 			ploygonMousePressEvent(event);
 		}
 	}
@@ -543,8 +543,7 @@ size_t GlobalGraphicsView::getPolygonArea(QGraphicsPathItem* item)
 	return ploygon_area.calArea();
 }
 
-void GlobalGraphicsView::ploygonMousePressEvent(QMouseEvent* event)
-{
+void GlobalGraphicsView::ploygonMousePressEvent(QMouseEvent* event) {
 	if (event->buttons() & Qt::RightButton) {
 		start_point = event->pos();
 		cur_ploygon = new QGraphicsPathItem();
@@ -557,21 +556,16 @@ void GlobalGraphicsView::ploygonMousePressEvent(QMouseEvent* event)
 		point_count = 0;
 		clicked_polygon_type = 0;
 	}
-	else if (event->buttons() & Qt::LeftButton)
-	{
+	else if (event->buttons() & Qt::LeftButton)	{
 		clicked_polygon_type = 1;
 		if (selected_ploygon)
-		{
 			selected_ploygon->setPen(redPen);
-		}
 		const auto letf_clicked_point = event->pos();
 		bool isRectHad = false;
 		QList<QGraphicsItem*> items = graphicsScene->items();
 		
-		for each (QGraphicsItem* item in items)
-		{
+		for each (QGraphicsItem* item in items) {
 			old_point = event->pos();
-
 			if (item->type() == QGraphicsPathItem::Type) {
 				auto buf_item = qgraphicsitem_cast<QGraphicsPathItem*>(item);
 
@@ -599,8 +593,7 @@ void GlobalGraphicsView::ploygonMousePressEvent(QMouseEvent* event)
 		if (!isRectHad) {
 			is_ploygon_selected = false;
 			selected_ploygon = nullptr;
-			for each (QGraphicsItem* item in items)
-			{
+			for each (QGraphicsItem* item in items)	{
 				if (item->type() == QGraphicsPathItem::Type) {
 					auto buf_item = qgraphicsitem_cast<QGraphicsPathItem*>(item);
 					if (buf_item->boundingRect().width() < 5) continue;
@@ -608,18 +601,14 @@ void GlobalGraphicsView::ploygonMousePressEvent(QMouseEvent* event)
 				}
 			}
 		}
-		
 	}
 	else
-	{
 		clicked_polygon_type = 2;
-	}
 }
 
 void GlobalGraphicsView::ploygonMouseReleaseEvent(QMouseEvent* event)
 {
-	if (clicked_polygon_type==0&&cur_ploygon != nullptr)
-	{
+	if (clicked_polygon_type==0 && cur_ploygon != nullptr) {
 		//将不符合的点删去
 		if (point_count < 5)
 		{

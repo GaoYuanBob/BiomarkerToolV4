@@ -6,9 +6,7 @@
 #include <QStackedWidget>
 #include <QRadioButton>
 using namespace std;
-BiomakerTool::BiomakerTool(QWidget *parent)
-	: QMainWindow(parent)
-{
+BiomakerTool::BiomakerTool(QWidget *parent)	: QMainWindow(parent) {
 	bufImg = 0;
 	ui.setupUi(this);
 	this->setWindowState(Qt::WindowMaximized);
@@ -35,11 +33,9 @@ BiomakerTool::BiomakerTool(QWidget *parent)
 
 	label_table_model = nullptr;
 	label_table_model = nullptr;
-
-
+	
 	polygon_map.clear();
 	circle_map.clear();
-
 
 	connect(ui.action_tif, SIGNAL(triggered()), this, SLOT(on_slotOpenImage_triggered()));
 	connect(local_graphics_view, SIGNAL(startPointChanged(QPointF)), this, SLOT(setShowImage(QPointF)));

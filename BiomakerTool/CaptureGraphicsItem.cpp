@@ -14,10 +14,6 @@ CaptureGraphicsItem::CaptureGraphicsItem(int sceneWidth, int sceneHeight, QPoint
 	setFlag(QGraphicsItem::ItemIsSelectable);
 }
 
-CaptureGraphicsItem::~CaptureGraphicsItem()
-{
-
-}
 void CaptureGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 	QWidget *widget)
 {
@@ -44,7 +40,6 @@ void CaptureGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsIte
 }
 
 void CaptureGraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
-
 	//whether the rects are seleted
 	if (event->button() == Qt::RightButton) {
 		if (isRectSeleted&&!selectedRect.contains(event->pos().toPoint() + startPoint)) {
