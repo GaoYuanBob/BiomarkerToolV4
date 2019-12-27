@@ -98,16 +98,21 @@ protected:
 	void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 	// ∑≈¥Û/Àı–°
 	void wheelEvent(QWheelEvent *event) Q_DECL_OVERRIDE;
-	public slots:
+	
+public slots:
 	void setZoomIn() {
+		qDebug() << "Zoom in button pressed!";
 		if (!isZoomIn) {
 			isZoomIn = true;
+			//this->scale(2, 2);
 			this->scale(2, 2);
 			emit sendZoomInState(isZoomIn);
 			update();
 		}
 	}
+	
 	void setZoomOut(){
+		qDebug() << "Zoom out button pressed!";
 		if (isZoomIn) {
 			isZoomIn = false;
 			this->scale(0.5, 0.5);

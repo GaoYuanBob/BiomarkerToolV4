@@ -145,12 +145,14 @@ void NavigationGraphicsView::setShowNavigationMinWindow(QPointF globalPoint) {
 	//navigationItem->setPen(pen[penType-1]);
 	update();
 }
+
+// "Zoom in" / "Zoom out" button action, "in": true, "out": false
+// 这里调整的是左下角的小图中的框
 void NavigationGraphicsView::setZoomInState(bool state) {
 	if (isZoomIn != state) {
 		this->isZoomIn = state;
 		QList<QGraphicsItem*> items = navigationScene->items();
-		for each (QGraphicsItem* item in items)
-		{
+		for each (QGraphicsItem* item in items) {
 			if (item->type() == QGraphicsRectItem::Type) {
 				QGraphicsRectItem *rect = qgraphicsitem_cast<QGraphicsRectItem*>(item);
 				if (rect == navigationItem) continue;
@@ -160,13 +162,11 @@ void NavigationGraphicsView::setZoomInState(bool state) {
 			}
 		}
 		if (isZoomIn) {
-
 			for (float x = 0; x <= image->width(); x += minWindowWidth/2) {
 				for (float y = 0; y <= image->height(); y += minWindowHeight / 2) {
 					navigationScene->addRect(x, y, minWindowWidth/2, minWindowHeight/2, QPen(Qt::black, 0.2, Qt::SolidLine, Qt::FlatCap));
 				}
 			}
-
 			QPointF buffer = rectItemStartPoint + QPointF(minWindowWidth / 4.0, minWindowHeight / 4.0);
 			currentBox = QRectF(buffer, QSize(minWindowWidth / 2, minWindowHeight / 2));
 			if (boundingBox.contains(currentBox))
@@ -178,7 +178,6 @@ void NavigationGraphicsView::setZoomInState(bool state) {
 					navigationScene->addRect(x, y, minWindowWidth, minWindowHeight, QPen(Qt::black, 0.2, Qt::SolidLine, Qt::FlatCap));
 				}
 			}
-
 			QPointF buffer = rectItemStartPoint - QPointF(minWindowWidth / 4.0, minWindowHeight / 4.0);
 			currentBox = QRectF(buffer, QSize(minWindowWidth, minWindowHeight));
 			if (boundingBox.contains(currentBox))
@@ -186,7 +185,5 @@ void NavigationGraphicsView::setZoomInState(bool state) {
 			setMakerNumber(nullptr, nullptr);
 		}
 	}
-
-
 	update();
 }

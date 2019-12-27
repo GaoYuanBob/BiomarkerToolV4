@@ -541,55 +541,47 @@ void LocalGraphicsView::mouseMoveEvent(QMouseEvent *event)
 	QGraphicsView::mouseMoveEvent(event);
 }
 
-void LocalGraphicsView::mousePressEvent(QMouseEvent *event)
-{
+void LocalGraphicsView::mousePressEvent(QMouseEvent *event) {
 	// graphicsScene->removeItem(cur_ploygon);
 	// delete cur_ploygon;
 	// cur_ploygon = nullptr;
 	//TODO
 
+	// qDebug() << "LocalGraphicsView::mousePressEvent";
+
 	if (/*!is_region_painting_set&&*/event->buttons() & Qt::LeftButton) {
 		bool isRectHad = false;
 		QList<QGraphicsItem*> items = graphicsScene->items();
-
-
-		for each (QGraphicsItem* item in items)
-		{
+		for each (QGraphicsItem* item in items) {
 			if (item->type() == GraphicsRectItem::Type) {
 				rectItem = qgraphicsitem_cast<GraphicsRectItem*>(item);
-
-				if (!isRectHad&&rectItem->isUnderMouse()) {
-
+				if (!isRectHad && rectItem->isUnderMouse()) {
 					isRectHad = true;
 					rectItem->setPen(getOldDotPen(rectItem));
 					isRectSeleted = true;
 					selectedRectItem = rectItem;
 					if (is_rect_item_loaded_from_file)
-					{
 						emit signal_SendCurrentRectItem(item);
-					}
 					continue;
-
 				}
-				if (isRectSeleted || !rectItem->isUnderMouse()) {
+				if (isRectSeleted || !rectItem->isUnderMouse())
 					rectItem->setPen(getOldPen(rectItem));
-				}
 			}
 		}
-
 		//if (isRectSeleted) {
 		//	selectedRectItem->setPen(getOldPen(selectedRectItem));
 		//	isRectSeleted = false;
 		//}
 
-		if (!isRectHad) {
+		if (!isRectHad)
 			isRectSeleted = false;
-
-		}
 		oldPoint = event->pos();
 	}
+
+	// 2019.12.27 目前画框只能是二倍（Zoomin）或者正常（zoomout）的情况，其他情况画出的框有问题
 	//判断该点是否在rect里面，如果在，记录该item
-	if (!is_region_painting_set&&event->buttons()& Qt::RightButton) {
+	if (!is_region_painting_set && event->buttons() & Qt::RightButton) {
+		// qDebug() << "draw rect selection";
 		isRectSeleted = false;
 		if (isZoomIn) {
 			if (!isRectSeleted) {
@@ -657,7 +649,6 @@ void LocalGraphicsView::localPloygonMousePressEvent(QMouseEvent *event)
 	}
 }
 
-
 void LocalGraphicsView::mouseReleaseEvent(QMouseEvent *event)
 {
 
@@ -693,7 +684,7 @@ void LocalGraphicsView::wheelEvent(QWheelEvent *event)
 	scrollAmount.y() > 0 ? zoomIn() : zoomOut();
 }
 
-// 放大
+// 放大 
 void LocalGraphicsView::zoomIn()
 {
 	//return;
@@ -737,8 +728,8 @@ void LocalGraphicsView::translate(QPointF delta)
 	setTransformationAnchor(QGraphicsView::AnchorViewCenter);
 }
 
-void LocalGraphicsView::circleMouseMoveEvent(QMouseEvent* event)
-{
+void LocalGraphicsView::circleMouseMoveEvent(QMouseEvent* event) {
+	//qDebug() << "LocalGraphicsView::circleMouseMoveEvent";
 	if (event->buttons() & Qt::RightButton) {
 
 		const QPointF cur_position = event->pos();
@@ -882,8 +873,8 @@ void LocalGraphicsView::ploygonMouseMoveEvent(QMouseEvent* event)
 	}
 }
 
-void LocalGraphicsView::ploygonMousePressEvent(QMouseEvent* event)
-{
+void LocalGraphicsView::ploygonMousePressEvent(QMouseEvent* event) {
+	//qDebug() << "ploygonMousePressEvent";
 	if (event->buttons() & Qt::RightButton) {
 
 		start_point = event->pos();
@@ -955,8 +946,8 @@ void LocalGraphicsView::ploygonMousePressEvent(QMouseEvent* event)
 	}
 }
 
-void LocalGraphicsView::ploygonMouseReleaseEvent(QMouseEvent* event)
-{
+void LocalGraphicsView::ploygonMouseReleaseEvent(QMouseEvent* event) {
+	//qDebug() << "ploygonMouseReleaseEvent";
 	if (clicked_polygon_type == 0 && cur_ploygon != nullptr)
 	{
 		//将不符合的点删去
@@ -992,8 +983,7 @@ void LocalGraphicsView::getRemovePolygon(QGraphicsPathItem* item)
 	}
 }
 
-void LocalGraphicsView::setNewPolygon(QPainterPath painter_path, double factor)
-{
+void LocalGraphicsView::setNewPolygon(QPainterPath painter_path, double factor) {
 	//获取原始坐标位置信息
 	QVector<QPointF> path_origin;
 	for(auto i=0;i< painter_path.elementCount();i++)
@@ -1012,9 +1002,9 @@ void LocalGraphicsView::setNewPolygon(QPainterPath painter_path, double factor)
 	emit sendLocalPolygon(path_origin, buf_path_item);
 	update();
 }
+
 //Debug 20190727
-void LocalGraphicsView::setNewPolygon(QPainterPath painter_path, double width_factor,double height_factor)
-{
+void LocalGraphicsView::setNewPolygon(QPainterPath painter_path, double width_factor,double height_factor) {
 	//获取原始坐标位置信息
 	QVector<QPointF> path_origin;
 	for (auto i = 0; i < painter_path.elementCount(); i++)
@@ -1036,7 +1026,6 @@ void LocalGraphicsView::setNewPolygon(QPainterPath painter_path, double width_fa
 	emit sendLocalPolygon(path_origin, buf_path_item);
 	update();
 }
-
 
 void LocalGraphicsView::setNewPolygonFromGlobalGraphicsView(QGraphicsPathItem*& item)
 {
@@ -1069,7 +1058,6 @@ int LocalGraphicsView::getRectCountInPolygon(QPainterPath graphics_path)
 	}
 	return count;
 }
-
 
 void LocalGraphicsView::updateMarkerNumber()
 {
