@@ -1,6 +1,19 @@
 # Biomarker-Tool-V4
 海马体标注工具
 
+## 操作方法
+分为LocalView和GlobalView；\
+LocalView下：\
+&emsp;&emsp;可以使用加减号进行缩放，`'shift'` + `'+'` 可以进行放大，`'-'` 进行缩小。\
+&emsp;&emsp;
+
+GloabalView下：\
+&emsp;&emsp;目前没有缩放功能。
+
+左下角的小图在两种view下不变，都是显示整个图像。点集小图像中的方块可以直接在大视图中定位到目标方块区域。在LocalView下直接切换，在GlobalView下不会切换，但是换到LocalView就切换到选择的区域了。
+
+选取区域使用鼠标右键，可以进行方块选取以及自由选取，目前缩放了之后画框就不对了。
+
 ## .dll and .lib Needed
 for libtiff（安装libtiff之后生成）\
 &emsp;&emsp;Debug:\
