@@ -1160,3 +1160,29 @@ void LocalGraphicsView::updatePolygonMarkerNumber()
 	}
 
 }
+
+void LocalGraphicsView::setNavigationWindowSize(int windowWidth, int windowHeight, float sclarFactor) {
+	this->navigationWindowWidth = windowWidth;
+	this->navigationWindowHeight = windowHeight;
+	this->navigationScalarFactor = sclarFactor;
+	//init
+	qDebug() << "setNavigationWindowSize";
+	qDebug() << "	tiffWidth = " << tiffWidth << ", tiffHeight = " << tiffHeight;
+	qDebug() << "	sceneWidth = " << sceneWidth << ", sceneHeight = " << sceneHeight;
+	qDebug() << "	tiffWidth / sceneWidth = " << tiffWidth / sceneWidth << ", tiffHeight / sceneHeight = " << tiffHeight / sceneHeight;
+	for (int k = 0; k < 5; k++) {
+		for (int i = 0; i < (int)(tiffWidth / sceneWidth) + 1; i++) {
+
+			QVector<int> zoomOutBuffer, zoomInBuffer;
+			for (int j = 0; j < (int)(tiffHeight / sceneHeight) + 1; j++) {
+				zoomOutBuffer.push_back(0);
+				//2±¶size
+				zoomInBuffer.push_back(0);
+				zoomInBuffer.push_back(0);
+			}
+			zoomOutMakerNumber[k].push_back(zoomOutBuffer);
+			zoomInMakerNumber[k].push_back(zoomInBuffer);
+			zoomInMakerNumber[k].push_back(zoomInBuffer);
+		}
+	}
+}

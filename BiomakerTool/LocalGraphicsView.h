@@ -1,11 +1,12 @@
 #pragma once
 
+#include "CaptureGraphicsItem.h"
+#include "GraphicsRectItem.h"
+
 #include <QGraphicsView>
 #include <QKeyEvent>
 #include <CaptureLabel.h>
-#include "CaptureGraphicsItem.h"
 #include <QGraphicsRectItem>
-#include "GraphicsRectItem.h"
 #include <QGraphicsPixmapItem>
 
 Q_DECLARE_METATYPE(QMouseEvent*);
@@ -26,68 +27,34 @@ public:
 	bool inBoundingBox(QPoint startPos);
 	QRect getRect(const QPointF &beginPoint, const QPointF& endPoint);
 	QPen& getPen(int penIndex) {
-		if (penIndex == 1)
-			return this->redPen;
-		else if (penIndex == 2)
-			return this->greenPen;
-		else if (penIndex == 3) 
-			return this->bluePen;
-		else if (penIndex == 4) 
-			return this->yellowPen;
-		else
-			return this->blackPen;
+		if (penIndex == 1)	return this->redPen;
+		if (penIndex == 2)	return this->greenPen;
+		if (penIndex == 3) 	return this->bluePen;
+		if (penIndex == 4) 	return this->yellowPen;
+		return this->blackPen;
 	}
+	
 	QPen& getOldDotPen(GraphicsRectItem* item) {
 		QPen oldPen = item->pen();
-		if (oldPen.color() == Qt::red)
-			return this->redDotPen;
-		else if (oldPen.color() == Qt::green)
-			return this->greenDotPen;
-		else if (oldPen.color() == Qt::blue)
-			return this->blueDotPen;
-		else if (oldPen.color() == Qt::yellow)
-			return this->yellowDotPen;
-		else
-			return this->blackDotPen;
+		if (oldPen.color() == Qt::red)	  return this->redDotPen;
+		if (oldPen.color() == Qt::green)  return this->greenDotPen;
+		if (oldPen.color() == Qt::blue)   return this->blueDotPen;
+		if (oldPen.color() == Qt::yellow) return this->yellowDotPen;
+		return this->blackDotPen;
 	}
+	
 	QPen& getOldPen(GraphicsRectItem* item) {
 		QPen oldPen = item->pen();
-		if (oldPen.color() == Qt::red)
-			return this->redPen;
-		else if (oldPen.color() == Qt::green)
-			return this->greenPen;
-		else if (oldPen.color() == Qt::blue)
-			return this->bluePen;
-		else if (oldPen.color() == Qt::yellow)
-			return this->yellowPen;
-		else
-			return this->blackPen;
+		if (oldPen.color() == Qt::red)    return this->redPen;
+		if (oldPen.color() == Qt::green)  return this->greenPen;
+		if (oldPen.color() == Qt::blue)   return this->bluePen;
+		if (oldPen.color() == Qt::yellow) return this->yellowPen;
+		return this->blackPen;
 	}
 
-	void setNavigationWindowSize(int windowWidth, int windowHeight, float sclarFactor) {
-		this->navigationWindowWidth = windowWidth;
-		this->navigationWindowHeight = windowHeight;
-		this->navigationScalarFactor = sclarFactor;
-		//init
-		for (int k = 0; k < 5; k++) {
-			for (int i = 0; i < (int)(tiffWidth/sceneWidth)+1; i++) {
-
-				QVector<int> zoomOutBuffer, zoomInBuffer;
-				for (int j = 0; j < (int)(tiffHeight / sceneHeight) + 1; j++) {
-					zoomOutBuffer.push_back(0);
-					//2倍size
-					zoomInBuffer.push_back(0);
-					zoomInBuffer.push_back(0);
-				}
-				zoomOutMakerNumber[k].push_back(zoomOutBuffer);
-				zoomInMakerNumber[k].push_back(zoomInBuffer);
-				zoomInMakerNumber[k].push_back(zoomInBuffer);
-			}
-		}
-	}
-protected:
-
+	void setNavigationWindowSize(int windowWidth, int windowHeight, float sclarFactor);
 	
+protected:
 	// 上/下/左/右键向各个方向移动、加/减键进行缩放、空格/回车键旋转
 	void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
 	void keyReleaseEvent(QKeyEvent* event) override;
@@ -224,8 +191,6 @@ private:
 	QRect boundingBox;
 	bool isZoomIn;
 	QRect tiffRec;
-
-
 	
 	int penIndex;
 
