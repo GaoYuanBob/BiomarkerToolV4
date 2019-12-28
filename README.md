@@ -31,11 +31,11 @@ for libtiff（安装libtiff之后生成）\
 
 ## 参考资料
 1. Using the TIFF Library：http://www.libtiff.org/libtiff.html#Mman \
-&emsp;&emsp;根据TIFF数据存储方式的不同，的I/O有三种方式：\
+根据TIFF数据存储方式的不同，的I/O有三种方式：\
 &emsp;&emsp;1）Scanline-based Image I/O：调用 TIFFReadScanline\
 &emsp;&emsp;2）Strip-oriented Image I/O：调用 TIFFReadEncodedStrip\
 &emsp;&emsp;3）Tile-oriented Image I/O：调用 TIFFReadTile\
-&emsp;&emsp;目前只支持第二种。\
+目前只支持第二种。
 2. TIFF Tag 含义: https://www.awaresystems.be/imaging/tiff/tifftags/baseline.html
 
 ## 可能的问题
