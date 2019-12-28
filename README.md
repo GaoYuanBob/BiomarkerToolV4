@@ -30,7 +30,7 @@ for libtiff（安装libtiff之后生成）\
 &emsp;&emsp;&emsp;&emsp;libtiff.lib
 
 ## 参考资料
-1. Using the TIFF Library：http://www.libtiff.org/libtiff.html#Mman\
+1. Using the TIFF Library：http://www.libtiff.org/libtiff.html#Mman \
 &emsp;&emsp;根据TIFF数据存储方式的不同，的I/O有三种方式：\
 &emsp;&emsp;1）Scanline-based Image I/O：调用 TIFFReadScanline\
 &emsp;&emsp;2）Strip-oriented Image I/O：调用 TIFFReadEncodedStrip\
