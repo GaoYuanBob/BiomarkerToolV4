@@ -18,7 +18,7 @@ public:
 
 	void updataCircleMarkerNumber();
 	void updataCircleMarkerNumber2();
-	size_t getCircleArea(QGraphicsEllipseItem* item);
+	size_t getCircleArea(QGraphicsEllipseItem* item) const;
 	void updatePolygonMarkerNumber();
 	void updateMarkerNumber();
 	void mouseReleaseEvent(QMouseEvent* event) override;
@@ -32,8 +32,8 @@ public:
 	void circleMouseReleaseEvent(QMouseEvent* event);
 
 	void ploygonMouseMoveEvent(QMouseEvent* event);
-	int getRectCountInPolygon(QPainterPath graphics_path);
-	size_t getPolygonArea(QGraphicsPathItem* item);
+	int getRectCountInPolygon(QPainterPath graphics_path) const;
+	size_t getPolygonArea(QGraphicsPathItem* item) const;
 	void ploygonMousePressEvent(QMouseEvent* event);
 	
 	void ploygonMouseReleaseEvent(QMouseEvent* event);

@@ -100,33 +100,33 @@ uint32* TiffReader::getLocalImage(QPointF startPoint, int sceneHeight, int scene
 	const int startStripRow = realStartRow % (int)imageRowsPerStrip;
 	const int endStripRow = realEndRow % (int)imageRowsPerStrip;
 
-	printf("\nrealStartRow = %d\n", realStartRow);
+	/*printf("\nrealStartRow = %d\n", realStartRow);
 	printf("realEndRow = %d\n", realEndRow);
 	printf("realStripStart = %d\n", realStripStart);
 	printf("realStripEnd = %d\n", realStripEnd);
 	printf("startStripRow = %d\n", startStripRow);
-	printf("endStripRow = %d\n\n", endStripRow);
+	printf("endStripRow = %d\n\n", endStripRow);*/
 	
 	int localStartRow = 0, localEndRow = 0;
-	int curIndex = sceneHeight - 1;
-	for (strip = realStripStart; strip <= realStripEnd; strip++) {
+	int curIdx = sceneHeight - 1;
+	for (strip = realStripStart; strip <= realStripEnd; strip++) {		
 		buf = static_cast<unsigned char *>(malloc(stripeSize));
 		TIFFReadEncodedStrip(tif, strip, buf, static_cast<tsize_t>(-1));
 		localStartRow = (strip == realStripStart) ? startStripRow : 0;
 		localEndRow = (strip == realStripEnd) ? endStripRow : (imageRowsPerStrip - 1);
 		
 		for (int i = localStartRow; i <= localEndRow; i++) {
-			if (curIndex < 0) {
+			if (curIdx < 0) {
 				free(buf);
 				return imageData;
 			}
 			for (int j = 0; j < sceneWidth; j++) {
-				imageData[curIndex*sceneWidth + j] = 0xff000000;
-				imageData[curIndex*sceneWidth + j] += (buf[3 * (i*imageWidth + (int)(startPoint.x()) + j)] & 0xff);
-				imageData[curIndex*sceneWidth + j] += (buf[3 * (i*imageWidth + (int)(startPoint.x()) + j) + 1] & 0xff) << 8;
-				imageData[curIndex*sceneWidth + j] += (buf[3 * (i*imageWidth + (int)(startPoint.x()) + j) + 2] & 0xff) << 16;
+				imageData[curIdx * sceneWidth + j] = 0xff000000
+					+  (buf[3 * (i * imageWidth + (int)(startPoint.x()) + j)] & 0xff)				// R
+					+ ((buf[3 * (i * imageWidth + (int)(startPoint.x()) + j) + 1] & 0xff) << 8)	    // G
+					+ ((buf[3 * (i * imageWidth + (int)(startPoint.x()) + j) + 2] & 0xff) << 16);	// B
 			}
-			curIndex--;
+			--curIdx;
 		}
 		free(buf);
 	}

@@ -33,7 +33,7 @@ public:
 	BiomakerTool(QWidget *parent = Q_NULLPTR);
 	~BiomakerTool();
 	void setNavigationBackground();
-	void updateGlobalRects();
+	void updateGlobalRects() const;
 	void setGlobalGraphicsImage();
 	void initListView();
 public slots:
@@ -49,8 +49,8 @@ public slots:
 	
 	void on_slotImportPaths_triggered();
 	void on_slotImportNav_triggered();
-	void setShowImage(QPointF);
-	void setNavigationChoosedImage(QPointF);
+	void setShowImage(QPointF) const;
+	void setNavigationChoosedImage(QPointF) const;
 	void writeFile(QVector<GraphicsRectItem*>&, QString filename);
 
 private:

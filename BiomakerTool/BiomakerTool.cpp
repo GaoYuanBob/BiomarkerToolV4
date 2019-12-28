@@ -1083,35 +1083,30 @@ void BiomakerTool::setNavigationBackground() {
 	navigationGraphicsView->show();
 }
 
-void BiomakerTool::updateGlobalRects()
-{
+void BiomakerTool::updateGlobalRects() const {
 	QList<QGraphicsItem*> items = local_graphics_view->graphicsScene->items();
 	QList<QGraphicsItem*> buffer_items;
-	for(auto i=0;i<items.size();i++)
-	{
-		if(items[i]->type()==GraphicsRectItem::Type)
-		{
-			if (qgraphicsitem_cast<GraphicsRectItem*>(items[i])->check_state == Qt::Checked)
-			{
+	for(auto i = 0; i < items.size(); i++)
+		if(items[i]->type() == GraphicsRectItem::Type && 
+		   qgraphicsitem_cast<GraphicsRectItem*>(items[i])->check_state == Qt::Checked)
 				buffer_items.push_back(items[i]);
-			}
-		}
-		
-	}
+
 	//global_graphics_view->updateRects(items, tiffReader->getGlobalFactor());
 	global_graphics_view->updateRects(buffer_items, tiffReader->getGlobalFactor());
 	global_graphics_view->updateRects(buffer_items, tiffReader->getGlobalWidthFactor(),tiffReader->getGlobalHeightFactor());
 }
 
-void BiomakerTool::setGlobalGraphicsImage()
-{
+void BiomakerTool::setGlobalGraphicsImage() {
 	if (!tiffReader) {
 		std::cout << "Please load global graphics image first." << std::endl;
 		return;
 	}
-	auto rect = local_graphics_view->geometry();
-	auto image_width = rect.width();
-	auto image_height = rect.height();
+	const auto rect = local_graphics_view->geometry();
+	int image_width = rect.width(), image_height = rect.height();
+
+	printf("BiomakerTool::setGlobalGraphicsImage!\n");
+	printf("image_width = %d, image_height + %d\n", image_width, image_height);
+	
 	global_graphics_view->setFixedWidth(image_width);
 	global_graphics_view->setFixedHeight(image_height);
 
@@ -1472,26 +1467,26 @@ void BiomakerTool::on_slotOpenImage_triggered(){
 	//Debug 20191120
 	connect(ui.actionExport_tif, &QAction::triggered, this, &BiomakerTool::on_slotExportMarkedTiff_triggered);
 }
-void BiomakerTool::setShowImage(QPointF startPoint) {
 
+// 设置 LocalView 下的绘制画面（每次图像移动都会调用，信号为 SIGNAL(startPointChanged(QPointF))）
+void BiomakerTool::setShowImage(QPointF startPoint) const {
+	// qDebug() << "BiomakerTool::setShowImage";
+	
 	//QImage *testImage = new QImage(sceneWidth, sceneHeight, QImage::Format_RGB32);
 	// startPoint 为绘制窗口左上角，在tiff图像中的位置
 	uint32* testData = tiffReader->getLocalImage(startPoint, sceneHeight, sceneWidth);
-	for (tstrip_t i = 0; i < sceneHeight; i++) {
-		for (tstrip_t j = 0; j < sceneWidth; j++) {
-			bufImg->setPixel(j, i, testData[i*sceneWidth + j]);
-		}
-	}
+	for (tstrip_t i = 0; i < sceneHeight; i++)
+		for (tstrip_t j = 0; j < sceneWidth; j++)
+			bufImg->setPixel(j, i, testData[i * sceneWidth + j]);
 
-	QImage swapImage = bufImg->rgbSwapped();
+	const QImage swapImage = bufImg->rgbSwapped();
 	//bufImg->invertPixels();
 	//qDebug() << starttime.elapsed() << endl;
 	local_graphics_view->updateImage(startPoint.toPoint(), QPixmap::fromImage(swapImage));
 	local_graphics_view->show();
 }
 
-void BiomakerTool::setNavigationChoosedImage(QPointF localPoint) {
-
+void BiomakerTool::setNavigationChoosedImage(QPointF localPoint) const {
 	//this startPoint represents the navigation choosed local index, which need to be transformed into global index.
 	QPoint globalPoint;
 
@@ -1499,8 +1494,8 @@ void BiomakerTool::setNavigationChoosedImage(QPointF localPoint) {
 	int x = (localPoint.x() *tiffWidth / navigationWidth);
 	int y = (localPoint.y() *tiffWidth / navigationWidth);
 
-	globalPoint.setX((int)x);
-	globalPoint.setY((int)y);
+	globalPoint.setX(x);
+	globalPoint.setY(y);
 	//qDebug() << navigationWidth*1.0f / tiffWidth << navigationHeight*1.0f/tiffHeight << localPoint << globalPoint;
 	if (tiffBoundingBox.contains(QRect(globalPoint, QSize(sceneWidth, sceneHeight)))){
 		uint32* tiffData = tiffReader->getRawData();

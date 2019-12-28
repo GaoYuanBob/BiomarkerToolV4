@@ -260,7 +260,7 @@ void GlobalGraphicsView::updataCircleMarkerNumber2()
 	emit sendShapeNumberMap(circle_number_map, ploygon_number_map);
 }
 
-size_t GlobalGraphicsView::getCircleArea(QGraphicsEllipseItem* item)
+size_t GlobalGraphicsView::getCircleArea(QGraphicsEllipseItem* item) const
 {
 	auto r = item->rect().width() / 2*width_factor;
 	return static_cast<size_t>(3.1415926535898 * r * r + 0.5);
@@ -516,7 +516,7 @@ void GlobalGraphicsView::ploygonMouseMoveEvent(QMouseEvent* event)
 	}
 }
 
-int GlobalGraphicsView::getRectCountInPolygon(QPainterPath graphics_path)
+int GlobalGraphicsView::getRectCountInPolygon(QPainterPath graphics_path) const
 {
 	int count = 0;
 	QList<QGraphicsItem*> items = graphicsScene->items();
@@ -536,7 +536,7 @@ int GlobalGraphicsView::getRectCountInPolygon(QPainterPath graphics_path)
 	return count;
 }
 
-size_t GlobalGraphicsView::getPolygonArea(QGraphicsPathItem* item)
+size_t GlobalGraphicsView::getPolygonArea(QGraphicsPathItem* item) const
 {
 	auto ploygon_area = PloygonArea(item, width_factor, height_factor,
 		pixmapItem->boundingRect().width()*width_factor, pixmapItem->boundingRect().height()*height_factor);
