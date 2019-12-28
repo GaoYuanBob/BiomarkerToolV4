@@ -182,10 +182,10 @@ void LocalGraphicsView::keyPressEvent(QKeyEvent *event)
 		moveOffset = QPoint(xOffset, 0);
 		break;
 	case Qt::Key_Plus:  // 放大	键盘 'shift' + '+'
-		//zoomIn();
+		zoomIn();
 		break;
 	case Qt::Key_Minus:  // 缩小 键盘 '-'
-		//zoomOut();
+		zoomOut();
 		break;
 	case Qt::Key_Space:  // 逆时针旋转
 		//rotate(-5);
@@ -665,26 +665,28 @@ void LocalGraphicsView::mouseReleaseEvent(QMouseEvent *event)
 }
 
 // 放大/缩小
-void LocalGraphicsView::wheelEvent(QWheelEvent *event)
-{
-	return;
+void LocalGraphicsView::wheelEvent(QWheelEvent *event) {
+	
 	// 滚轮的滚动量
 	QPoint scrollAmount = event->angleDelta();
 	// 正值表示滚轮远离使用者（放大），负值表示朝向使用者（缩小）
-	scrollAmount.y() > 0 ? zoomIn() : zoomOut();
+	if (scrollAmount.y() > 0)
+		emit sendWheelUpState(true);
+	else
+		emit sendWheelUpState(false);
 }
 
 // 放大 
 void LocalGraphicsView::zoomIn()
 {
-	//return;
+	return;
 	zoom(1 + m_zoomDelta);
 }
 
 // 缩小
 void LocalGraphicsView::zoomOut()
 {
-	//return;
+	return;
 	zoom(1 - m_zoomDelta);
 }
 

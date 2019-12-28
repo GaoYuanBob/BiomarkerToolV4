@@ -48,8 +48,9 @@ public slots:
 	
 	void on_slotImportPaths_triggered();
 	void on_slotImportNav_triggered();
-	void setShowImage(QPointF) const;
-	void setNavigationChoosedImage(QPointF) const;
+	void setShowImage(QPointF);
+	void updateZT(bool);
+	void setNavigationChoosedImage(QPointF);
 	void writeFile(QVector<GraphicsRectItem*>&, QString filename);
 
 private:
@@ -89,4 +90,8 @@ private:
 
 	//Debug
 	QMap<QGraphicsPathItem*, QString> polygon_name_map;
+
+	// GY
+	uint zt = 1;		// Ëõ·ÅÏµÊý
+	QPoint curStartPoint;
 };

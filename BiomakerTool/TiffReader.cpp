@@ -121,10 +121,11 @@ uint32* TiffReader::getLocalImage(QPointF startPoint, int sceneHeight, int scene
 				return imageData;
 			}
 			for (int j = 0; j < sceneWidth; j++) {
+				const uint32 tmp = 3 * (i * imageWidth + static_cast<int>(startPoint.x()) + j);
 				imageData[curIdx * sceneWidth + j] = 0xff000000
-					+  (buf[3 * (i * imageWidth + (int)(startPoint.x()) + j)] & 0xff)				// R
-					+ ((buf[3 * (i * imageWidth + (int)(startPoint.x()) + j) + 1] & 0xff) << 8)	    // G
-					+ ((buf[3 * (i * imageWidth + (int)(startPoint.x()) + j) + 2] & 0xff) << 16);	// B
+					+  (buf[tmp] & 0xff)				// R
+					+ ((buf[tmp + 1] & 0xff) << 8)	    // G
+					+ ((buf[tmp + 2] & 0xff) << 16);	// B
 			}
 			--curIdx;
 		}

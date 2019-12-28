@@ -63,9 +63,6 @@ void NavigationGraphicsView::setNavigationMinWindowSize(float minWindowWidth, fl
 	update();
 }
 
-NavigationGraphicsView::~NavigationGraphicsView()
-{
-}
 void NavigationGraphicsView::setFactor(float factor) {
 	this->factor = factor;
 }
@@ -106,9 +103,6 @@ void NavigationGraphicsView::mousePressEvent(QMouseEvent *event) {
 			update();
 		}
 	}
-}
-void NavigationGraphicsView::mouseReleaseEvent(QMouseEvent *event){
-
 }
 
 QRect NavigationGraphicsView::getRect(const QPoint &beginPoint, const QPoint& endPoint)

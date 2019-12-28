@@ -140,6 +140,7 @@ public slots:
 
 	Q_SIGNALS:
 	void startPointChanged(QPointF);
+	void sendWheelUpState(bool);
 	void sendZoomInState(bool);
 	void sendRedLabelNumbers(int);
 	void sendGreenLabelNumbers(int);
