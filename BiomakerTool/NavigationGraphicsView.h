@@ -16,13 +16,13 @@ class NavigationGraphicsView : public QGraphicsView
 
 public:
 	NavigationGraphicsView(int width, int height, QWidget *parent);
-	~NavigationGraphicsView();
+	~NavigationGraphicsView() = default;
 	void setNavigationMinWindowSize(float minWindowWidth, float minWindowHeight);
 	void setImage(QImage* image);
 	void setFactor(float factor);
 
 	void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
-	void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+	//void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 
 	QRect getRect(const QPoint &beginPoint, const QPoint& endPoint);
 	QColor getColor(int penType, int num){
