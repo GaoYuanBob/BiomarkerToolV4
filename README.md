@@ -40,3 +40,4 @@ for libtiff（安装libtiff之后生成）\
 
 ## 可能的问题
 1. 目前只支持压缩方式为**不压缩**的，即 `TIFFGetField(tif, TIFFTAG_COMPRESSION, &imageCompression);` 读取出来的 `imageCompression` 只能是1。（因为目前读取方式为：TIFFReadEncodedStrip，只能读取）
+2. GlobalView据绘制窗口的比例和图像比例的关系，对长或者宽进行裁剪，所以会出现右边有一部分LocalView画面的情况
