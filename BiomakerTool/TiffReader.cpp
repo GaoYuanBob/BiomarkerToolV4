@@ -198,10 +198,11 @@ uint32* TiffReader::getGlobalGraphicsImage(int sceneHeight, int sceneWidth) {
 			const int curCol = sampleLine[strip][i];
 
 			for (int j = 0; j < imageWidth; j++) {
+				const int tmp = 3 * (curCol * imageWidth + j);
 				rowData[j] = 0xff000000
-				+ (buf[3 * (curCol * imageWidth + j)] & 0xff)				// R
-				+ ((buf[3 * (curCol * imageWidth + j) + 1] & 0xff) << 8)	// G
-				+ ((buf[3 * (curCol * imageWidth + j) + 2] & 0xff) << 16);	// B
+				+ (buf[tmp] & 0xff)				 // R
+				+ ((buf[tmp + 1] & 0xff) << 8)	 // G
+				+ ((buf[tmp + 2] & 0xff) << 16); // B
 			}
 			for (int j = 0; j < sceneWidth; j++)
 				global_graphics_data[curIdx * (sceneWidth) + j] = rowData[int(j * xBlockLen)];
@@ -244,8 +245,6 @@ uint32* TiffReader::getNavigationData(float navigationWidth, float navigationHei
 	long long calcRow = 0;
 	int tempRow = 0;
 
-
-
 	tdata_t buf2;
 	uint32 row;
 
@@ -254,15 +253,12 @@ uint32* TiffReader::getNavigationData(float navigationWidth, float navigationHei
 
 	std::cout << "TIFFTAG_PLANARCONFIG : " << config << std::endl;
 
-
 	int tileSize = TIFFTileSize(tif);
 
 	stripnumber = TIFFNumberOfStrips(tif);
 
 	std::cout << "stripSize : " << TIFFStripSize(tif) << std::endl;
 	std::cout << "strip number : " << stripnumber << std::endl;
-
-	
 
 	uint32* testData = (uint32*)malloc(imageWidth*imageRowsPerStrip* sizeof(uint32));
 	
