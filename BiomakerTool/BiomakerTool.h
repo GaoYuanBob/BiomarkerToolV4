@@ -19,8 +19,7 @@
 #include "labeltableview.h"
 #include "labeltablemodel.h"
 
-struct Region
-{
+struct Region {
 	QString number = 0;
 	QString name = "Untitled";
 };

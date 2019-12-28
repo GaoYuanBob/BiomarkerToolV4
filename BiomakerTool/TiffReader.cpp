@@ -86,7 +86,7 @@ uint32* TiffReader::getLocalImage(QPointF startPoint, int sceneHeight, int scene
 		free(imageData);
 	imageData = static_cast<uint32*>(malloc(sceneHeight * sceneWidth * sizeof(uint32)));
 
-	qDebug() << "Position of startPoint: " << startPoint;
+	//qDebug() << "Position of startPoint: " << startPoint;
 	
 	//1. find the row range from start to end
 	int realStartRow = 0, realEndRow = 0;
@@ -166,14 +166,14 @@ uint32* TiffReader::getGlobalGraphicsImage(int sceneHeight, int sceneWidth) {
 	std::cout << "strip number : " << stripnumber << std::endl;
 	//Debug 20190727
 	
-	global_factor = static_cast<double>(imageWidth) / sceneWidth;
+	//global_factor = static_cast<double>(imageWidth) / sceneWidth;
 	global_height_factor = static_cast<double>(imageLength) / sceneHeight;
 	global_width_factor = static_cast<double>(imageWidth) / sceneWidth;
 
-	const double xBlockLen = global_width_factor;
-	const double yBlockLen = global_height_factor;
+	const double xBlockLen = global_height_factor;
+	const double yBlockLen = global_width_factor;
 
-	printf("xBlockLen = %lf, yBlockLen = %lf\n", xBlockLen, yBlockLen);
+	printf("xBlockLen = %lf, yBlockLen = %lf\n", xBlockLen, yBlockLen);	// temp1458_6GB: ()
 
 	QVector<QVector<int>> sampleLine;
 	sampleLine.resize(stripnumber);
@@ -186,30 +186,28 @@ uint32* TiffReader::getGlobalGraphicsImage(int sceneHeight, int sceneWidth) {
 		cur -= imageRowsPerStrip;
 	}
 	uint32* rowData = static_cast<uint32*>(malloc(imageWidth * sizeof(uint32)));
-	int tempIndex = sceneHeight - 1;
+	int curIdx = sceneHeight - 1;
 	// de-order
 	for (strip = 0; strip < stripnumber; strip++) {
 		if (sampleLine[strip].size() == 0) continue;
-		TIFFReadEncodedStrip(tif, strip, buf, (tsize_t)-1);
+		TIFFReadEncodedStrip(tif, strip, buf, static_cast<tsize_t>(-1));
 		//find corresponding row and save
 		for (int i = 0; i < sampleLine[strip].size(); i++) {
-			if (tempIndex <= 0) break;
-			int curCol = sampleLine[strip][i];
+			if (curIdx <= 0) break;
+			const int curCol = sampleLine[strip][i];
 
 			for (int j = 0; j < imageWidth; j++) {
-				rowData[j] = 0xff000000;
-				rowData[j] += (buf[3 * (curCol*imageWidth + j)] & 0xff);
-				rowData[j] += (buf[3 * (curCol*imageWidth + j) + 1] & 0xff) << 8;
-				rowData[j] += (buf[3 * (curCol*imageWidth + j) + 2] & 0xff) << 16;
+				rowData[j] = 0xff000000
+				+ (buf[3 * (curCol * imageWidth + j)] & 0xff)				// R
+				+ ((buf[3 * (curCol * imageWidth + j) + 1] & 0xff) << 8)	// G
+				+ ((buf[3 * (curCol * imageWidth + j) + 2] & 0xff) << 16);	// B
 			}
-			for (int j = 0; j < (int)sceneWidth; j++) {
-				global_graphics_data[tempIndex*((int)sceneWidth) + j] = rowData[int(j * xBlockLen)];
-			}
-			tempIndex--;
+			for (int j = 0; j < sceneWidth; j++)
+				global_graphics_data[curIdx * (sceneWidth) + j] = rowData[int(j * xBlockLen)];
+			--curIdx;
 		}
 	}
 	sampleLine.clear();
-	qDebug() << "index range is :" << tempIndex;
 	free(buf);
 	free(rowData);
 	return global_graphics_data;

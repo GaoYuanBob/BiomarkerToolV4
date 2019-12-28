@@ -1114,6 +1114,8 @@ void BiomakerTool::setGlobalGraphicsImage() {
 		image_height = (tiffHeight * 1.0f / tiffWidth) * image_width;
 	else
 		image_width = (tiffWidth * 1.0f / tiffHeight) * image_height;
+
+	// 根据绘制窗口的比例和图像比例的关系，对长或者宽进行裁剪，所以会出现右边有一部分LocalView画面的情况
 	std::cout << "Image width : " << image_width << ", Image height : " << image_height << std::endl;
 
 	uint32* global_graphics_image_data = tiffReader->getGlobalGraphicsImage(image_height, image_width);
