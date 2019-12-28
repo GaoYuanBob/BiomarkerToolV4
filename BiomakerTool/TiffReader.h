@@ -14,7 +14,7 @@ public:
 	uint32* getNavigationData(float navigationWidth, float navigationHeight, int xblocklen, int yblocklen);
 	void saveTiffFile(const QString& file_name, uint32* image_data);
 	uint32* getLocalImage(QPointF startPoint, int sceneHeight, int sceneWidth);
-	uint32* getGlobalGraphicsImage();
+	//uint32* getGlobalGraphicsImage();
 	uint32* getGlobalGraphicsImage(int sceneHeight, int sceneWidth);
 	//Debug 20190728
 	double getGlobalFactor() const { return global_factor; }

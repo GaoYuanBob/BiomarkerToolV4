@@ -134,64 +134,59 @@ uint32* TiffReader::getLocalImage(QPointF startPoint, int sceneHeight, int scene
 	return imageData;
 }
 
-uint32* TiffReader::getGlobalGraphicsImage()
-{
-	if(raster == NULL)
-	{
-		raster = (uint32*)_TIFFmalloc(imageWidth*imageLength * sizeof(uint32)); // 分配适当格式的内存
-	}
-	
-	if (raster != NULL) {
-		qDebug() << "Get image end.";
-		if (TIFFReadRGBAImage(tif, imageWidth, imageLength, raster, 0)) { // 读入图像数据
-			qDebug() << "Get tiff image successfully.";
-		}
-		else {
-			qDebug() << "Error: copy data";
-		}
-		//_TIFFfree(raster); // 释放内存
-	}
-	return raster;
-}
+//uint32* TiffReader::getGlobalGraphicsImage()
+//{
+//	if(raster == NULL)
+//	{
+//		raster = (uint32*)_TIFFmalloc(imageWidth*imageLength * sizeof(uint32)); // 分配适当格式的内存
+//	}
+//	
+//	if (raster != NULL) {
+//		qDebug() << "Get image end.";
+//		if (TIFFReadRGBAImage(tif, imageWidth, imageLength, raster, 0)) { // 读入图像数据
+//			qDebug() << "Get tiff image successfully.";
+//		}
+//		else {
+//			qDebug() << "Error: copy data";
+//		}
+//		//_TIFFfree(raster); // 释放内存
+//	}
+//	return raster;
+//}
 
-uint32* TiffReader::getGlobalGraphicsImage(int sceneHeight, int sceneWidth)
-{
-	global_graphics_data = (uint32*)malloc((int)sceneHeight*(int)sceneWidth* sizeof(uint32));
+uint32* TiffReader::getGlobalGraphicsImage(int sceneHeight, int sceneWidth) {
+	global_graphics_data = static_cast<uint32*>(malloc(sceneHeight * sceneWidth * sizeof(uint32)));
 
 	stripeSize = TIFFStripSize(tif);
-	buf = (unsigned char *)malloc(stripeSize);
+	buf = static_cast<unsigned char *>(malloc(stripeSize));
 
 	stripnumber = TIFFNumberOfStrips(tif);
 
 	std::cout << "stripSize : " << TIFFStripSize(tif) << std::endl;
 	std::cout << "strip number : " << stripnumber << std::endl;
 	//Debug 20190727
-	double xblocklen = imageWidth / sceneWidth;
-	//global_factor = xblocklen;
-	global_factor = (1.f*imageWidth) / (1.f*sceneWidth);
-	global_height_factor = imageLength * 1.f / sceneHeight;
-	global_width_factor = (1.f*imageWidth) / (1.f*sceneWidth);
+	
+	global_factor = static_cast<double>(imageWidth) / sceneWidth;
+	global_height_factor = static_cast<double>(imageLength) / sceneHeight;
+	global_width_factor = static_cast<double>(imageWidth) / sceneWidth;
 
-	double yblocklen = imageLength / sceneHeight;
+	const double xBlockLen = global_width_factor;
+	const double yBlockLen = global_height_factor;
 
-	xblocklen = global_width_factor;
-	yblocklen = global_height_factor;
-
-	qDebug() << "xblocklen and yblocklen: " << xblocklen << yblocklen<<" "<< global_width_factor <<" "<< global_height_factor;
+	printf("xBlockLen = %lf, yBlockLen = %lf\n", xBlockLen, yBlockLen);
 
 	QVector<QVector<int>> sampleLine;
 	sampleLine.resize(stripnumber);
 	double cur = 0;
-	int last = 0;
 	for (int i = 0; i < sampleLine.size(); i++) {
 		while (cur < imageRowsPerStrip) {
 			sampleLine[i].push_back(static_cast<int>(cur));
-			cur += yblocklen;
+			cur += yBlockLen;
 		}
 		cur -= imageRowsPerStrip;
 	}
-	uint32* rowData = (uint32*)malloc(imageWidth* sizeof(uint32));
-	int tempIndex = (int)sceneHeight - 1;
+	uint32* rowData = static_cast<uint32*>(malloc(imageWidth * sizeof(uint32)));
+	int tempIndex = sceneHeight - 1;
 	// de-order
 	for (strip = 0; strip < stripnumber; strip++) {
 		if (sampleLine[strip].size() == 0) continue;
@@ -208,7 +203,7 @@ uint32* TiffReader::getGlobalGraphicsImage(int sceneHeight, int sceneWidth)
 				rowData[j] += (buf[3 * (curCol*imageWidth + j) + 2] & 0xff) << 16;
 			}
 			for (int j = 0; j < (int)sceneWidth; j++) {
-				global_graphics_data[tempIndex*((int)sceneWidth) + j] = rowData[int(j*xblocklen)];
+				global_graphics_data[tempIndex*((int)sceneWidth) + j] = rowData[int(j * xBlockLen)];
 			}
 			tempIndex--;
 		}

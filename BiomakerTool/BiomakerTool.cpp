@@ -939,7 +939,6 @@ void BiomakerTool::on_slotExportMarkedTiff_triggered()
 {
 	const auto image_height = tiffReader->getHeight();
 	const auto image_width = tiffReader->getWidth();
-	//uint32* image_data = tiffReader->getGlobalGraphicsImage();
 	uint32* image_data = tiffReader->getLocalImage(QPoint(0, 0), image_height, image_width);
 	QImage image(reinterpret_cast<uchar*>(image_data), image_width, image_height, QImage::Format_RGB32);
 
@@ -1096,6 +1095,7 @@ void BiomakerTool::updateGlobalRects() const {
 	global_graphics_view->updateRects(buffer_items, tiffReader->getGlobalWidthFactor(),tiffReader->getGlobalHeightFactor());
 }
 
+// 每次打开一个tiff文件执行一次
 void BiomakerTool::setGlobalGraphicsImage() {
 	if (!tiffReader) {
 		std::cout << "Please load global graphics image first." << std::endl;
@@ -1105,28 +1105,22 @@ void BiomakerTool::setGlobalGraphicsImage() {
 	int image_width = rect.width(), image_height = rect.height();
 
 	printf("BiomakerTool::setGlobalGraphicsImage!\n");
-	printf("image_width = %d, image_height + %d\n", image_width, image_height);
+	printf("image_width = %d, image_height = %d\n", image_width, image_height);
 	
 	global_graphics_view->setFixedWidth(image_width);
 	global_graphics_view->setFixedHeight(image_height);
 
-	if (image_width*1.0f / image_height < tiffWidth*1.0f / tiffHeight)
-	{
-		image_height = (tiffHeight*1.0f / tiffWidth)*image_width;
-	}
+	if (image_width * 1.0f / image_height < tiffWidth * 1.0f / tiffHeight)
+		image_height = (tiffHeight * 1.0f / tiffWidth) * image_width;
 	else
-	{
-		image_width = (tiffWidth*1.0f / tiffHeight)*image_height;
-	}
-	std::cout << "Image width : " << image_width << "\t Image height : " << image_height << std::endl;
+		image_width = (tiffWidth * 1.0f / tiffHeight) * image_height;
+	std::cout << "Image width : " << image_width << ", Image height : " << image_height << std::endl;
 
 	uint32* global_graphics_image_data = tiffReader->getGlobalGraphicsImage(image_height, image_width);
 	global_graphics_image = new QImage(image_width, image_height, QImage::Format_RGB32);
-	for (tstrip_t i = 0; i < image_height; i++) {
-		for (tstrip_t j = 0; j < image_width; j++) {
+	for (tstrip_t i = 0; i < image_height; i++)
+		for (tstrip_t j = 0; j < image_width; j++)
 			bufImg->setPixel(j, i, global_graphics_image_data[i*image_width + j]);
-		}
-	}
 	const auto swap_image = bufImg->rgbSwapped();
 	
 	global_graphics_view->updateImage(QPixmap::fromImage(swap_image));
