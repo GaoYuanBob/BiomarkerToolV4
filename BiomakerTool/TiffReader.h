@@ -36,6 +36,5 @@ private:
 	int stripnumber;
 	long long stripeSize;
 	//Debug 20190728
-	double global_factor;
-	double global_width_factor; double global_height_factor;
+	double global_factor, global_width_factor, global_height_factor;
 };
