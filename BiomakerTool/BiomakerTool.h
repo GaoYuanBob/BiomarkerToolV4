@@ -94,4 +94,7 @@ private:
 	// GY
 	uint zt = 1;		// Ëõ·ÅÏµÊý
 	QPoint curStartPoint;
+
+Q_SIGNALS:
+	void sendZTtoLocalView(int zt);
 };

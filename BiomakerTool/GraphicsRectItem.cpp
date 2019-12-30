@@ -6,7 +6,3 @@ GraphicsRectItem::GraphicsRectItem(QPoint startPoint,int penIndex,QPoint localTo
 	this->penType = penIndex;
 	this->localTopLeft = localTopLeft;
 }
-
-GraphicsRectItem::~GraphicsRectItem()
-{
-}

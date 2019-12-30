@@ -2,7 +2,6 @@
 #include <iostream>
 
 LocalGraphicsView::LocalGraphicsView( QWidget *parent) : QGraphicsView(parent) {
-	//this->startPoint = QPoint(tiffWidth / 2 - 1, tiffHeight / 2 - 1);
 	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	//setCursor(Qt::PointingHandCursor);
@@ -13,7 +12,6 @@ LocalGraphicsView::LocalGraphicsView( QWidget *parent) : QGraphicsView(parent) {
 	rectTopLeft = QPoint(0, 0);
 	isRectSeleted = false;
 	isZoomIn = false;
-	oldBuf = QPoint(0, 0);
 	setScene(graphicsScene);
 
 	redLabelNumber = 0;
@@ -39,6 +37,8 @@ LocalGraphicsView::LocalGraphicsView( QWidget *parent) : QGraphicsView(parent) {
 	selected_ploygon = nullptr;
 	cur_circle = nullptr;
 	cur_ploygon = nullptr;
+
+	zt = 1;
 }
 
 void LocalGraphicsView::setTiffSize(int tiffWidth, int tiffHeight, int sceneWidth, int sceneHeight) {
@@ -65,22 +65,24 @@ void LocalGraphicsView::setStartPoint(const QPointF& start_point)
 }
 
 void LocalGraphicsView::updateImage(QPoint startP, QPixmap& pixmap) {
-
-	//oldStartPoint = startP;
+	oldStartPoint = startP;
 	QList<QGraphicsItem *> items = graphicsScene->items(); 
 	qreal minZvalue = 1<<31;
 	for (int i = 0; i < items.size();i++){
 		QGraphicsItem *item = items[i];
-		int type = item->type();
 		minZvalue = qMin(item->zValue(), minZvalue);
-		if (type == GraphicsRectItem::Type) {
+		if (item->type() == GraphicsRectItem::Type) {
 			GraphicsRectItem *rect = qgraphicsitem_cast<GraphicsRectItem*>(item);
-			//TODO:: 这里有问题
-			QPoint offset = oldStartPoint - this->startPoint;
-			if (this->startPoint != startP) {
-				offset = this->startPoint - startP;
-			}
-			rect->setPos(rect->pos() + offset);
+			QPoint offset = (oldStartPoint - startP);
+			if (this->startPoint != startP)
+				printf("startPoint != startP\n");
+
+			// 每次左键松开鼠标，rect->pos()就变成了(0, 0)
+			//qDebug() << "rect->pos() = " << rect->pos();
+			QPointF newPos = (rect->startPoint + rect->localTopLeft - startP) / zt + offset;
+
+			rect->setScale(rect->originScale * 1.0 / zt);
+			rect->setPos(newPos);
 		}
 		else if (item->type() == QGraphicsPixmapItem::Type) { 
 			QGraphicsPixmapItem *scene = qgraphicsitem_cast<QGraphicsPixmapItem*>(item);
@@ -88,38 +90,31 @@ void LocalGraphicsView::updateImage(QPoint startP, QPixmap& pixmap) {
 			delete scene;
 		}
 		//Debug 20190726
-		else if(item->type() == QGraphicsPathItem::Type)
-		{
+		else if(item->type() == QGraphicsPathItem::Type) {
 			QGraphicsPathItem *rect = qgraphicsitem_cast<QGraphicsPathItem*>(item);
+			
 			auto path = rect->path();
-			QPoint offset = oldStartPoint - this->startPoint;
-			if (this->startPoint != startP) {
-				offset = this->startPoint - startP;
-			}
-
-			for(auto i=0;i< path.elementCount();i++)
-			{
+			QPoint offset = (oldStartPoint - this->startPoint);
+			if (this->startPoint != startP)
+				offset = (this->startPoint - startP);
+			//QRectF rec;
+			for(auto i=0;i< path.elementCount();i++) {
 				QPointF result_point = path.elementAt(i)+offset;
 				path.setElementPositionAt(i, result_point.x(), result_point.y());
 			}
 			rect->setPath(path);
 		}
 	}
-
 	//当前的path
-	
-	if(cur_ploygon)
-	{
-		QPoint offset = oldStartPoint - this->startPoint;
-		for (auto i = 0; i < cur_paint_path.elementCount(); i++)
-		{
+	if(cur_ploygon)	{
+		QPoint offset = (oldStartPoint - this->startPoint);
+		for (auto i = 0; i < cur_paint_path.elementCount(); i++) {
 			QPointF result_point = cur_paint_path.elementAt(i) + offset;
 			cur_paint_path.setElementPositionAt(i, result_point.x(), result_point.y());
 		}
 		cur_ploygon->setPath(cur_paint_path);
 	}
 	
-
 	pixmapItem = graphicsScene->addPixmap(pixmap);
 	pixmapItem->setZValue(minZvalue);
 
@@ -181,12 +176,12 @@ void LocalGraphicsView::keyPressEvent(QKeyEvent *event)
 		//translate(QPointF(2, 0));  // 右移
 		moveOffset = QPoint(xOffset, 0);
 		break;
-	//case Qt::Key_Plus:  // 放大	键盘 'shift' + '+'
-	//	zoomIn();
-	//	break;
-	//case Qt::Key_Minus:  // 缩小 键盘 '-'
-	//	zoomOut();
-	//	break;
+	case Qt::Key_Plus:  // 放大	键盘 'shift' + '+'
+		zoomIn();
+		break;
+	case Qt::Key_Minus:  // 缩小 键盘 '-'
+		zoomOut();
+		break;
 	//case Qt::Key_Space:  // 逆时针旋转
 		//rotate(-5);
 		//break;
@@ -372,36 +367,10 @@ void LocalGraphicsView::keyReleaseEvent(QKeyEvent *event)
 	//std::cout << is_control_key_push << std::endl;
 }
 
-QRect LocalGraphicsView::getRect(const QPointF &beginPoint, const QPointF& endPoint)
-{
-	int x, y, width, height;
-	width = qAbs(beginPoint.x() - endPoint.x());
-	height = qAbs(beginPoint.y() - endPoint.y());
-	x = beginPoint.x() < endPoint.x() ? beginPoint.x() : endPoint.x();
-	y = beginPoint.y() < endPoint.y() ? beginPoint.y() : endPoint.y();
-
-	QRect selectedRect = QRect(x, y, width, height);
-	if (selectedRect.width() == 0)
-	{
-		selectedRect.setWidth(1);
-	}
-	if (selectedRect.height() == 0)
-	{
-		selectedRect.setHeight(1);
-	}
-	return selectedRect;
-
-}
-
-// 平移
 void LocalGraphicsView::mouseMoveEvent(QMouseEvent *event) {
 	if (event->buttons() & Qt::LeftButton) {
 		m_lastMousePos = event->pos();
-		QPoint moveOffset = m_lastMousePos - oldPoint;
-
-		//拉近视角时将移速降低2倍
-		if (isZoomIn)
-			moveOffset /= 2;
+		QPoint moveOffset = (m_lastMousePos - oldPoint);
 
 		QRect sceneRect = QRect(QPoint(startPoint - moveOffset), QSize(sceneWidth, sceneHeight));
 		if (tiffRec.contains(sceneRect)) {
@@ -426,119 +395,65 @@ void LocalGraphicsView::mouseMoveEvent(QMouseEvent *event) {
 					emit startPointChanged(startPoint);
 				}
 			}
-			
 		}
 		oldPoint = m_lastMousePos;
 		update();
 	}
 	if (!is_region_painting_set&&event->buttons() & Qt::RightButton) {
 		dragEndPoint = event->pos();
-		QPoint buf = dragEndPoint - dragStartPoint;
-
-		oldBuf = buf;
-		if (isZoomIn) {
-			dragEndPoint = dragEndPoint / 2 + QPoint(sceneWidth / 4, sceneHeight / 4);
-			if (!(qAbs(rectTopLeft.x() - dragEndPoint.x()) <= 5 || qAbs(rectTopLeft.y() - dragEndPoint.y()) <= 5)) {
-				rectItem->setRect(getRect(rectTopLeft, dragEndPoint));
-				if (!rectItem->isCounted) {
-					if (penIndex == 1) {
-						redLabelNumber++;
-						//qDebug() << "the red Label number is" << redLabelNumber;
-						emit sendRedLabelNumbers(redLabelNumber);
-					}
-					else if (penIndex == 2) {
-						greenLabelNumber++;
-						emit sendGreenLabelNumbers(greenLabelNumber);
-					}
-					else if (penIndex == 3){
-						blueLabelNumber++;
-						emit sendBlueLabelNumbers(blueLabelNumber);
-					}
-					else if (penIndex == 4){
-						yellowLabelNumber++;
-						emit sendYellowLabelNumbers(yellowLabelNumber);
-					}
-					else {
-						blackLabelNumber++;
-						emit sendBlackLabelNumbers(blackLabelNumber);
-					}
-					rectItem->isCounted = true;
-
-					//增加该区域的标记数量
-					int navigationX = (int)(((rectTopLeft/2 + startPoint).x() + 0)*1.0f / sceneWidth);
-					int navigationY = (int)(((rectTopLeft/2 + startPoint).y() + 0)*1.0f / sceneHeight);
-					zoomOutMakerNumber[penIndex - 1][navigationX][navigationY]++;
-
-					emit sendMakerNumber(zoomOutMakerNumber, zoomInMakerNumber);
+		const int x_len = abs(static_cast<int>(rectTopLeft.x()) - dragEndPoint.x());
+		const int y_len = abs(static_cast<int>(rectTopLeft.y()) - dragEndPoint.y());
+		const double topLeftX = std::min(static_cast<int>(rectTopLeft.x()), dragEndPoint.x());
+		const double topLeftY = std::min(static_cast<int>(rectTopLeft.y()), dragEndPoint.y());
+		
+		// 框画的过小就不管了
+		// rectTopLeft 和 dragEndPoint 都是相对于窗口左上角而言的
+		if (!(qAbs(rectTopLeft.x() - dragEndPoint.x()) <= 3 || qAbs(rectTopLeft.y() - dragEndPoint.y()) <= 3)) {
+			rectItem->setRect(topLeftX, topLeftY, x_len, y_len);
+			rectItem->originScale = zt;
+			rectItem->x_len = x_len;
+			rectItem->y_len = y_len;
+			
+			//rectItem->setRect(getRect(rectTopLeft, dragEndPoint));
+			if (!rectItem->isCounted) {
+				if (penIndex == 1) {
+					redLabelNumber++;
+					emit sendRedLabelNumbers(redLabelNumber);
 				}
+				else if (penIndex == 2) {
+					greenLabelNumber++;
+					emit sendGreenLabelNumbers(greenLabelNumber);
+				}
+				else if (penIndex == 3) {
+					blueLabelNumber++;
+					emit sendBlueLabelNumbers(blueLabelNumber);
+				}
+				else if (penIndex == 4) {
+					yellowLabelNumber++;
+					emit sendYellowLabelNumbers(yellowLabelNumber);
+				}
+				else {
+					blackLabelNumber++;
+					emit sendBlackLabelNumbers(blackLabelNumber);
+				}
+				rectItem->isCounted = true;
+
+				// 增加该区域的标记数量 用于左下角绘制，画框多的区域，左下角会变色
+				int navigationX = (int)(((rectTopLeft + startPoint).x() + 0)*1.0f / sceneWidth);
+				int navigationY = (int)(((rectTopLeft + startPoint).y() + 0)*1.0f / sceneHeight);
+				zoomOutMakerNumber[penIndex - 1][navigationX][navigationY]++;
+
+				emit sendMakerNumber(zoomOutMakerNumber, zoomInMakerNumber);
+				// 增加该区域的标记数量 用于左下角绘制，画框多的区域，左下角会变色
 			}
 		}
-		else {
-			if (!(qAbs(rectTopLeft.x() - dragEndPoint.x()) <= 3 || qAbs(rectTopLeft.y() - dragEndPoint.y()) <= 3)) {
-				rectItem->setRect(getRect(rectTopLeft, dragEndPoint));
-				if (!rectItem->isCounted) {
-					if (penIndex == 1) {
-						redLabelNumber++;
-						//qDebug() << "the red Label number is" << redLabelNumber;
-						emit sendRedLabelNumbers(redLabelNumber);
-					}
-					else if (penIndex == 2) {
-						greenLabelNumber++;
-						emit sendGreenLabelNumbers(greenLabelNumber);
-					}
-					else if (penIndex == 3){
-						blueLabelNumber++;
-						emit sendBlueLabelNumbers(blueLabelNumber);
-					}
-					else if (penIndex == 4){
-						yellowLabelNumber++;
-						emit sendYellowLabelNumbers(yellowLabelNumber);
-					}
-					else {
-						blackLabelNumber++;
-						emit sendBlackLabelNumbers(blackLabelNumber);
-					}
-					rectItem->isCounted = true;
-
-					//增加该区域的标记数量
-					int navigationX = (int)(((rectTopLeft + startPoint).x() + 0)*1.0f / sceneWidth);
-					int navigationY = (int)(((rectTopLeft + startPoint).y() + 0)*1.0f / sceneHeight);
-					zoomOutMakerNumber[penIndex-1][navigationX][navigationY]++;
-
-					emit sendMakerNumber(zoomOutMakerNumber, zoomInMakerNumber);
-				}
-				
-				
-			}
-		}
-
-		//qDebug() << rectItem->rect();
 		update();
 	}
-	if(is_region_painting_set)
-	{
-		// if (is_circle_draw)
-		// {
-		// 	circleMouseMoveEvent(event);
-		// }
-		// else
-		// {
-		// 	ploygonMouseMoveEvent(event);
-		// }
-	}
-
 	QGraphicsView::mouseMoveEvent(event);
 }
 
 void LocalGraphicsView::mousePressEvent(QMouseEvent *event) {
-	// graphicsScene->removeItem(cur_ploygon);
-	// delete cur_ploygon;
-	// cur_ploygon = nullptr;
-	//TODO
-
-	// qDebug() << "LocalGraphicsView::mousePressEvent";
-
-	if (/*!is_region_painting_set&&*/event->buttons() & Qt::LeftButton) {
+	if (event->buttons() & Qt::LeftButton) {
 		bool isRectHad = false;
 		QList<QGraphicsItem*> items = graphicsScene->items();
 		for each (QGraphicsItem* item in items) {
@@ -572,41 +487,30 @@ void LocalGraphicsView::mousePressEvent(QMouseEvent *event) {
 	if (!is_region_painting_set && event->buttons() & Qt::RightButton) {
 		// qDebug() << "draw rect selection";
 		isRectSeleted = false;
-		if (isZoomIn) {
-			if (!isRectSeleted) {
-				rectTopLeft = event->pos();
-				rectTopLeft = rectTopLeft / 2 + QPoint(sceneWidth / 4, sceneHeight / 4);
-				//qDebug() << "isZoomIn RecTopLeft Point is: " << rectTopLeft;
-				rectItem = new GraphicsRectItem(startPoint, penIndex);
-				rectItem->setPen(getPen(penIndex));
-				graphicsScene->addItem(rectItem);
-			}
-		}
-		else {
-			if (!isRectSeleted) {
-				rectTopLeft = event->pos();
-				//qDebug() << "isZoomOut RecTopLeft Point is: " << rectTopLeft;
-				rectItem = new GraphicsRectItem(startPoint, penIndex);
 
-				rectItem->setPen(getPen(penIndex));
-				graphicsScene->addItem(rectItem);
-			}
-		}
+		rectTopLeft = event->pos();
+		rectItem = new GraphicsRectItem(startPoint, penIndex);
+		rectItem->setPen(getPen(penIndex));
+		graphicsScene->addItem(rectItem);
+
+		
+		//if (isZoomIn) {
+		//	rectTopLeft = event->pos();
+		//	rectTopLeft = rectTopLeft / 2 + QPoint(sceneWidth / 4, sceneHeight / 4);
+		//	rectItem = new GraphicsRectItem(startPoint, penIndex);
+		//	rectItem->setPen(getPen(penIndex));
+		//	graphicsScene->addItem(rectItem);
+		//}
+		//else {
+		//	// startPoint 是绘制窗口的左上角在TIFF图像中的位置
+		//	// rectTopLeft 是画的框左上角在窗口中相对于窗口左上角的位置，两个相加就是框的左上角在TIFF图像中的位置
+		//	rectTopLeft = event->pos();
+		//	rectItem = new GraphicsRectItem(startPoint, penIndex);
+		//	rectItem->setPen(getPen(penIndex));
+		//	graphicsScene->addItem(rectItem);
+		//}
 	}
 
-	//交互
-	if (is_region_painting_set)
-	{
-		localPloygonMousePressEvent(event);
-		// if (is_circle_draw)
-		// {
-		// 	circleMousePressEvent(event);
-		// }
-		// else
-		// {
-		// 	ploygonMousePressEvent(event);
-		// }
-	}
 	QGraphicsView::mousePressEvent(event);
 }
 
@@ -637,84 +541,52 @@ void LocalGraphicsView::localPloygonMousePressEvent(QMouseEvent *event)
 
 void LocalGraphicsView::mouseReleaseEvent(QMouseEvent *event)
 {
-
-	//if (isRectSeleted) {
-//
-	//	rectItem->setPen(QPen(Qt::red, 0.9, Qt::SolidLine, Qt::FlatCap));
-	//	rectItem->update();
-	//	isRectSeleted = false;
-
-	//}
-	if(is_region_painting_set)
-	{
-		// if (is_circle_draw)
-		// {
-		// 	circleMouseReleaseEvent(event);
-		// }
-		// else
-		// {
-		// 	ploygonMouseReleaseEvent(event);
-		// }
-	}
-
 	QGraphicsView::mouseReleaseEvent(event);
 }
 
 // 放大/缩小
 void LocalGraphicsView::wheelEvent(QWheelEvent *event) {
-	
+	//QGraphicsView::wheelEvent(event);
 	// 滚轮的滚动量
 	const QPoint scrollAmount = event->angleDelta();
 	// 正值表示滚轮远离使用者（放大），负值表示朝向使用者（缩小）
-	if (scrollAmount.y() > 0)
+	if (scrollAmount.y() > 0) 
 		emit sendWheelUpState(true);
 	else
 		emit sendWheelUpState(false);
+
+	QRect sceneRect = QRect(QPoint(startPoint), QSize(sceneWidth, sceneHeight));
+	if (tiffRec.contains(sceneRect)) {
+		oldStartPoint = startPoint;
+		emit startPointChanged(startPoint);
+	}
+	else {
+		sceneRect = QRect(startPoint, QSize(sceneWidth, sceneHeight));
+		if (tiffRec.contains(sceneRect)) {
+			oldStartPoint = startPoint;
+			emit startPointChanged(startPoint);
+		}
+		else {
+			sceneRect = QRect(startPoint, QSize(sceneWidth, sceneHeight));
+			if (tiffRec.contains(sceneRect)) {
+				oldStartPoint = startPoint;
+				emit startPointChanged(startPoint);
+			}
+		}
+	}
+	//oldPoint = m_lastMousePos;
+	//update();
 }
-//
-//// 放大 
-//void LocalGraphicsView::zoomIn()
-//{
-//	return;
-//	zoom(1 + m_zoomDelta);
-//}
-//
-//// 缩小
-//void LocalGraphicsView::zoomOut()
-//{
-//	return;
-//	zoom(1 - m_zoomDelta);
-//}
-//
-//// 缩放 - scaleFactor：缩放的比例因子
-//void LocalGraphicsView::zoom(float scaleFactor)
-//{
-//	//return;
-//	// 防止过小或过大
-//	qreal factor = transform().scale(scaleFactor, scaleFactor).mapRect(QRectF(0, 0, 1, 1)).width();
-//	if (factor < 0.07 || factor > 100)
-//		return;
-//
-//	scale(scaleFactor, scaleFactor);
-//	m_scale *= scaleFactor;
-//}
-//
-//// 平移
-//void LocalGraphicsView::translate(QPointF delta)
-//{
-//	return;
-//	// 根据当前 zoom 缩放平移数
-//	delta *= m_scale;
-//	delta *= m_translateSpeed;
-//
-//	// view 根据鼠标下的点作为锚点来定位 scene
-//	setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
-//	QPoint newCenter(tiffWidth / 2 - delta.x(), tiffWidth / 2 - delta.y());
-//	centerOn(mapToScene(newCenter));
-//
-//	// scene 在 view 的中心点作为锚点
-//	setTransformationAnchor(QGraphicsView::AnchorViewCenter);
-//}
+
+// 放大 
+void LocalGraphicsView::zoomIn() {
+	emit sendWheelUpState(false);
+}
+
+// 缩小
+void LocalGraphicsView::zoomOut() {
+	emit sendWheelUpState(true);
+}
 
 void LocalGraphicsView::circleMouseMoveEvent(QMouseEvent* event) {
 	//qDebug() << "LocalGraphicsView::circleMouseMoveEvent";

@@ -40,6 +40,7 @@ BiomakerTool::BiomakerTool(QWidget *parent)	: QMainWindow(parent) {
 	connect(ui.action_tif, SIGNAL(triggered()), this, SLOT(on_slotOpenImage_triggered()));
 	connect(local_graphics_view, SIGNAL(startPointChanged(QPointF)), this, SLOT(setShowImage(QPointF)));
 	connect(local_graphics_view, SIGNAL(sendWheelUpState(bool)), this, SLOT(updateZT(bool)));
+	connect(this, SIGNAL(sendZTtoLocalView(int)), local_graphics_view, SLOT(updateZTinLocalView(int)));
 	
 	connect(ui.action_export, SIGNAL(triggered()), this, SLOT(on_slotExportMark_triggered()));
 	connect(ui.action_exportnav, SIGNAL(triggered()), this, SLOT(on_slotExportNav_triggered()));
@@ -373,6 +374,7 @@ void BiomakerTool::on_slotImportNav_triggered() {
 	filei.close();
 
 }
+
 void BiomakerTool::on_slotImportMark_triggered() {
 
 	QStringList fileNames = QFileDialog::getOpenFileNames(this, "Open Mark File", "./workspace", tr("Marks (*.mark )"));
@@ -385,21 +387,17 @@ void BiomakerTool::on_slotImportMark_triggered() {
 	pen[2] = QPen(Qt::blue, 1.5, Qt::SolidLine, Qt::FlatCap);
 	pen[3] = QPen(Qt::yellow, 1.5, Qt::SolidLine, Qt::FlatCap);
 	pen[4] = QPen(Qt::black, 1.5, Qt::SolidLine, Qt::FlatCap);
-
-
+	
 	auto items = local_graphics_view->graphicsScene->items();
 
-	for (auto item : items)
-	{
-		if (item->type() == GraphicsRectItem::Type)
-		{
+	for (auto item : items)	{
+		if (item->type() == GraphicsRectItem::Type)	{
 			local_graphics_view->graphicsScene->removeItem(item);
 			delete item;
 		}
 	}
-
-	for (int i = 0; i < fileNames.size(); i++) {
-		
+	QPoint start_point;
+	for (int i = 0; i < fileNames.size(); i++) {	
 		//create new rectItem for graphicview
 		ifstream filei;
 		filei.open((fileNames.at(i).toStdString()));
@@ -413,98 +411,76 @@ void BiomakerTool::on_slotImportMark_triggered() {
 		int sx, sy, x, y, w, h;
 		//Debug 20190516 扩大兼容性
 		bool checked_state = true;
+		
 		for (int i = 0; i < itemNumber; i++) {
-
+			// 左上角坐标，0,0，宽，高
 			filei >> sx >> sy >> x >> y >> w >> h;
 			//qDebug() << sx << sy << x << y << w << h;
-			QPoint startP(sx, sy);
-			
+			QPoint global_start_point(sx, sy);
+			start_point = global_start_point;
 			//兼容前后两版本的数据
 			QPoint topleft(0, 0);
-
-			/*if (!((x >= 0 && x < 3) && y == 0))
-			{
-				topleft = QPoint(x, y);
-				checked_state = false;
-			}
-			else
-			{
-				checked_state = true;
-			}*/
-
 			
-			QPoint offset(scene_width / 2, scene_height / 2);
-			QPoint global_top_left = startP + topleft;
-			QPoint global_start_point = global_top_left - offset;
-			if (global_start_point.x()<0)
-			{
-				auto offset_x = global_start_point.x(); //负数
-				global_start_point.setX(0);
-				offset.setX(offset.x() + offset_x);
-			}
-			else if (global_start_point.x() + scene_width>=tiffWidth)
-			{
-				auto offset_x = global_start_point.x();
-				global_start_point.setX(tiffWidth - scene_width - 1);
-				offset_x = global_start_point.x() - offset_x; //负数
-				offset.setX(offset.x() - offset_x);
-			}
-			if (global_start_point.y()<0)
-			{
-				auto offset_y = global_start_point.y();
-				global_start_point.setY(0);
-				offset.setY(offset.y() + offset_y);
-			}
-			else if (global_start_point.y() + scene_height >= tiffHeight)
-			{
-				auto offset_y = global_start_point.y();
-				global_start_point.setY(tiffHeight - scene_height - 1);
-				offset_y = global_start_point.y() - offset_y;
-				offset.setY(offset.y() - offset_y);
-			}
-			//GraphicsRectItem* item = new GraphicsRectItem(startP, penType);
+			//QPoint offset(scene_width / 2, scene_height / 2);
+			//QPoint global_top_left = startP + topleft;
+			//QPoint global_start_point = global_top_left -offset;
+			//if (global_start_point.x()<0)
+			//{
+			//	auto offset_x = global_start_point.x(); //负数
+			//	global_start_point.setX(0);
+			//	offset.setX(offset.x() + offset_x);
+			//}
+			//else if (global_start_point.x() + scene_width >= tiffWidth)
+			//{
+			//	auto offset_x = global_start_point.x();
+			//	global_start_point.setX(tiffWidth - scene_width - 1);
+			//	offset_x = global_start_point.x() - offset_x; //负数
+			//	offset.setX(offset.x() - offset_x);
+			//}
+			//if (global_start_point.y()<0)
+			//{
+			//	auto offset_y = global_start_point.y();
+			//	global_start_point.setY(0);
+			//	offset.setY(offset.y() + offset_y);
+			//}
+			//else if (global_start_point.y() + scene_height >= tiffHeight){
+			//	auto offset_y = global_start_point.y();
+			//	global_start_point.setY(tiffHeight - scene_height - 1);
+			//	offset_y = global_start_point.y() - offset_y;
+			//	offset.setY(offset.y() - offset_y);
+			//}
 			GraphicsRectItem* item = new GraphicsRectItem(global_start_point, penType);
 
 			//item->localTopLeft = topleft;
-			item->localTopLeft = offset;
-			if (checked_state)
-			{
-				if (x == 0)
-				{
-					item->check_state = Qt::Unchecked;
-					item->setPen(pen[0]);
-				}
-				//2 错误 绿色
-				else if (x == 2)
-				{
-					item->check_state = Qt::PartiallyChecked;
-					item->setPen(pen[1]);
-				}
-				//1 正确 黑色
-				else if (x == 1)
-				{
-					item->check_state = Qt::Checked;
-					item->setPen(pen[4]);
-				}
-				else
-				{
-					QMessageBox msgBox;
-					msgBox.setText("Error mark format. This version is not compatible with loaded mark file. You can load this file in lower version.");
-					msgBox.exec();
-					return;
-				}
-			}
-			else
-			{
-				item->check_state = Qt::Unchecked;
-				item->setPen(pen[0]);
-			}
-			//item->setRect(QRect(topleft+startP-local_graphics_view->startPoint,QSize(w,h)));
-			item->setRect(QRect(global_top_left - local_graphics_view->startPoint, QSize(w, h)));
-			//item->setPen(pen[penType-1]);
+			item->localTopLeft = QPoint(0, 0);
+			//if (checked_state) {
+			//	if (x == 0)	{
+			//		item->check_state = Qt::Unchecked;
+			//		item->setPen(pen[0]);
+			//	}
+			//	//2 错误 绿色
+			//	else if (x == 2) {
+			//		item->check_state = Qt::PartiallyChecked;
+			//		item->setPen(pen[1]);
+			//	}
+			//	//1 正确 黑色
+			//	else if (x == 1){
+			//		item->check_state = Qt::Checked;
+			//		item->setPen(pen[4]);
+			//	}
+			//	else {
+			//		QMessageBox msgBox;
+			//		msgBox.setText("Error mark format. This version is not compatible with loaded mark file. You can load this file in lower version.");
+			//		msgBox.exec();
+			//		return;
+			//	}
+			//}
+			//else {
+			//	item->check_state = Qt::Unchecked;
+			//	item->setPen(pen[0]);
+			//}
+			item->setRect(QRect(global_start_point - local_graphics_view->startPoint, QSize(w, h)));
 			local_graphics_view->graphicsScene->addItem(item);
-
-			//fileo << global_start_point.x() << " " << global_start_point.y() << " " << item->localTopLeft.x() << " " << item->localTopLeft.y() << " " << w << " " << h << endl;
 		}
 		//fileo.close();
 		filei.close();
@@ -533,7 +509,6 @@ void BiomakerTool::on_slotImportMark_triggered() {
 			local_graphics_view->blackLabelNumber += itemNumber;
 			emit local_graphics_view->sendBlackLabelNumbers(local_graphics_view->blackLabelNumber);
 		}
-		
 	}
 	updateGlobalRects();
 	is_rect_loaded_from_file = true;
@@ -553,7 +528,10 @@ void BiomakerTool::on_slotImportMark_triggered() {
 	//初始化listview视图
 	initListView();
 	is_init_list_view_show = true;
+
+	setShowImage(start_point);
 }
+
 void BiomakerTool::on_slotImportPaths_triggered() {
 
 
@@ -743,8 +721,9 @@ void BiomakerTool::on_slotExportNav_triggered() {
 	}
 	outfile.close();
 }
-void BiomakerTool::on_slotExportMark_triggered() {
 
+
+void BiomakerTool::on_slotExportMark_triggered() {
 	QString exportPath = "./Result/";
 	QString exportName;
 	QImage outputImage;
@@ -894,6 +873,7 @@ void BiomakerTool::on_slotExportMark_triggered() {
 		}
 	}
 }
+
 void BiomakerTool::on_slotExportPaths_triggered()
 {
 	auto paths = global_graphics_view->exportPathItem();
@@ -992,6 +972,7 @@ void BiomakerTool::on_slotExportMarkedTiff_triggered()
 	_TIFFfree(image_data);
 }
 
+// 导出 mark 为 .mark 文件
 void BiomakerTool::writeFile(QVector<GraphicsRectItem*>& rectItems, QString qfilename) {
 	if (!rectItems.isEmpty()) {
 		ofstream outfile;
@@ -1008,21 +989,26 @@ void BiomakerTool::writeFile(QVector<GraphicsRectItem*>& rectItems, QString qfil
 				//Debug 20190416
 				//outfile << rectItems[i]->startPoint.x()<<" "<<rectItems[i]->startPoint.y()
 				//	<< " " << rectItems[i]->localTopLeft.x() << " " << rectItems[i]->localTopLeft.y() << " " << captureRect.width() << " " << captureRect.height() << endl;
-				outfile << rectItems[i]->startPoint.x() + rectItems[i]->localTopLeft.x() << " " << rectItems[i]->startPoint.y() + rectItems[i]->localTopLeft.y()
-					<< " " << 0 << " " << 0 << " " << captureRect.width() << " " << captureRect.height() << endl;
+				outfile << rectItems[i]->startPoint.x() + rectItems[i]->localTopLeft.x()* rectItems[i]->originScale << " "
+			<< rectItems[i]->startPoint.y() + rectItems[i]->localTopLeft.y()* rectItems[i]->originScale
+					<< " " << 0 << " " << 0 << " "
+			<< captureRect.width() * rectItems[i]->originScale << " " << captureRect.height() * rectItems[i]->originScale << endl;
 
 			else {
 				//Debug 20190416
 				//outfile << rectItems[i]->startPoint.x() << " " << rectItems[i]->startPoint.y()
 				//	<< " " << captureRect.topLeft().x() << " " << captureRect.topLeft().y() << " " << captureRect.width() << " " << captureRect.height() << endl;
-				outfile << rectItems[i]->startPoint.x() + captureRect.topLeft().x() << " " << rectItems[i]->startPoint.y() + captureRect.topLeft().y()
-						<< " " << 0 << " " << 0 << " " << captureRect.width() << " " << captureRect.height() << endl;
+				outfile << rectItems[i]->startPoint.x() + captureRect.topLeft().x()* rectItems[i]->originScale << " "
+				<< rectItems[i]->startPoint.y() + captureRect.topLeft().y()* rectItems[i]->originScale
+						<< " " << 0 << " " << 0 << " "
+				<< captureRect.width() * rectItems[i]->originScale << " " << captureRect.height() * rectItems[i]->originScale << endl;
 
 			}
 		}
 		outfile.close();
 	}
 }
+
 BiomakerTool::~BiomakerTool() {
 	//delete tiffReader;
 }
@@ -1467,17 +1453,18 @@ void BiomakerTool::on_slotOpenImage_triggered(){
 }
 
 void BiomakerTool::updateZT(bool isUp) {
-	if (isUp && zt <= 6)
+	if (isUp && zt <= 5)
 		zt += 1;
 	else if (!isUp && zt > 1)
 		zt -= 1;
+	else
+		return;
 	setShowImage(curStartPoint);
+	emit sendZTtoLocalView(zt);
 }
 
 // 设置 LocalView 下的绘制画面（每次图像移动都会调用，信号为 SIGNAL(startPointChanged(QPointF))）
 void BiomakerTool::setShowImage(QPointF startPoint) {
-	// qDebug() << "BiomakerTool::setShowImage";
-
 	curStartPoint = startPoint.toPoint();
 	
 	//QImage *testImage = new QImage(sceneWidth, sceneHeight, QImage::Format_RGB32);
@@ -1507,6 +1494,7 @@ void BiomakerTool::setNavigationChoosedImage(QPointF localPoint) {
 
 	curStartPoint = globalPoint;
 	zt = 1;	// 缩放需要重置
+	emit sendZTtoLocalView(1);
 	
 	//qDebug() << navigationWidth*1.0f / tiffWidth << navigationHeight*1.0f/tiffHeight << localPoint << globalPoint;
 	if (tiffBoundingBox.contains(QRect(globalPoint, QSize(sceneWidth, sceneHeight)))){

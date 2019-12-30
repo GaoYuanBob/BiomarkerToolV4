@@ -24,7 +24,6 @@ public:
 	void setTiffSize(int tiffWidth, int tiffHeight, int sceneWidth, int sceneHeight);
 	void setStartPoint(const QPointF& start_point);
 	bool inBoundingBox(QPoint startPos);
-	QRect getRect(const QPointF &beginPoint, const QPointF& endPoint);
 	QPen& getPen(int penIndex) {
 		if (penIndex == 1)	return this->redPen;
 		if (penIndex == 2)	return this->greenPen;
@@ -63,7 +62,7 @@ protected:
 	void localPloygonMousePressEvent(QMouseEvent* event);
 	void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 	// 放大/缩小
-	void wheelEvent(QWheelEvent *event) Q_DECL_OVERRIDE;
+	void wheelEvent(QWheelEvent *event) override;
 	
 public slots:
 	void setZoomIn() {
@@ -113,8 +112,8 @@ public slots:
 	}
 	
 public slots:
-	//void zoomIn();  // 放大
-	//void zoomOut();  // 缩小
+	void zoomIn();  // 放大
+	void zoomOut();  // 缩小
 	//void zoom(float scaleFactor); // 缩放 - scaleFactor：缩放的比例因子
 	//void translate(QPointF delta);  // 平移
 	//
@@ -137,6 +136,10 @@ public slots:
 	void setNewPolygon(QPainterPath painter_path, double factor);
 	void setNewPolygon(QPainterPath painter_path, double width_factor, double height_factor);
 	void setNewPolygonFromGlobalGraphicsView(QGraphicsPathItem*& item);
+
+	void updateZTinLocalView(int _zt) {
+		zt = _zt;
+	}
 
 Q_SIGNALS:
 	void startPointChanged(QPointF);
@@ -183,7 +186,6 @@ private:
 	QGraphicsPixmapItem *pixmapItem;
 	QPoint dragStartPoint, dragEndPoint;
 	QPointF selectedRectTopLeft;
-	QPoint oldBuf;
 	bool isRectSeleted;
 	GraphicsRectItem *selectedRectItem;
 	QRect boundingBox;
@@ -195,8 +197,7 @@ private:
 	QPen redPen, greenPen, bluePen, yellowPen, blackPen;
 	QPen redDotPen, greenDotPen, blueDotPen, yellowDotPen, blackDotPen;
 
-	int navigationWindowWidth;
-	int navigationWindowHeight;
+	int navigationWindowWidth, navigationWindowHeight;
 	float navigationScalarFactor;
 	bool is_rect_item_loaded_from_file = false;
 
@@ -227,9 +228,11 @@ private:
 	bool is_region_painting_set = false;
 	QVector<QPointF> polygon_region;
 
+	int zt = 1;	// Zoom Times
+
 public:
 	QGraphicsScene* graphicsScene;
-	QPoint startPoint;
+	QPoint startPoint;	// 绘制窗口的左上角在TIFF图像中的位置
 	QVector<QVector<int>> zoomOutMakerNumber[5], zoomInMakerNumber[5];
 
 	int redLabelNumber = 0, greenLabelNumber = 0, blueLabelNumber = 0, yellowLabelNumber = 0, blackLabelNumber = 0;

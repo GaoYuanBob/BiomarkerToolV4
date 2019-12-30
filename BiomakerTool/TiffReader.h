@@ -7,9 +7,9 @@ class TiffReader {
 public:
 	TiffReader(QString filename);
 	~TiffReader();
-	uint32* getRawData();
-	uint32 getWidth();
-	uint32 getHeight();
+	uint32* getRawData() const;
+	uint32 getWidth() const;
+	uint32 getHeight() const;
 	uint32* getNavigationData(float navigationWidth, float navigationHeight, int xblocklen, int yblocklen);
 	void saveTiffFile(const QString& file_name, uint32* image_data);
 	uint32* getLocalImage(QPointF startPoint, int sceneHeight, int sceneWidth);

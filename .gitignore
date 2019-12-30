@@ -4,3 +4,4 @@ BiomakerTool/GeneratedFiles
 *.bmp
 *.db
 packages
+*.mark

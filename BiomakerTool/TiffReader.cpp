@@ -72,13 +72,16 @@ TiffReader::~TiffReader() {
 	//delete tif;
 	TIFFClose(tif);
 }
-uint32* TiffReader::getRawData() {
+
+uint32* TiffReader::getRawData() const {
 	return this->raster;
 }
-uint32 TiffReader::getWidth() {
+
+uint32 TiffReader::getWidth() const {
 	return this->imageWidth;
 }
-uint32 TiffReader::getHeight() {
+
+uint32 TiffReader::getHeight() const {
 	return this->imageLength;
 }
 
