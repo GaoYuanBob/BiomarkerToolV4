@@ -375,18 +375,19 @@ void BiomakerTool::on_slotImportNav_triggered() {
 
 }
 
+// 导入 .mark 文件
 void BiomakerTool::on_slotImportMark_triggered() {
 
 	QStringList fileNames = QFileDialog::getOpenFileNames(this, "Open Mark File", "./workspace", tr("Marks (*.mark )"));
-	if (fileNames.isEmpty()) {
+	if (fileNames.isEmpty())
 		return;
-	}
+
 	QPen pen[5];
-	pen[0] = QPen(Qt::red, 1.5, Qt::SolidLine, Qt::FlatCap);
-	pen[1] = QPen(Qt::green, 1.5, Qt::SolidLine, Qt::FlatCap);
-	pen[2] = QPen(Qt::blue, 1.5, Qt::SolidLine, Qt::FlatCap);
-	pen[3] = QPen(Qt::yellow, 1.5, Qt::SolidLine, Qt::FlatCap);
-	pen[4] = QPen(Qt::black, 1.5, Qt::SolidLine, Qt::FlatCap);
+	pen[0] = QPen(Qt::red,		1.5, Qt::SolidLine, Qt::FlatCap);
+	pen[1] = QPen(Qt::green,	1.5, Qt::SolidLine, Qt::FlatCap);
+	pen[2] = QPen(Qt::blue,		1.5, Qt::SolidLine, Qt::FlatCap);
+	pen[3] = QPen(Qt::yellow,	1.5, Qt::SolidLine, Qt::FlatCap);
+	pen[4] = QPen(Qt::black,	1.5, Qt::SolidLine, Qt::FlatCap);
 	
 	auto items = local_graphics_view->graphicsScene->items();
 
@@ -421,34 +422,33 @@ void BiomakerTool::on_slotImportMark_triggered() {
 			//兼容前后两版本的数据
 			QPoint topleft(0, 0);
 			
-			//QPoint offset(scene_width / 2, scene_height / 2);
-			//QPoint global_top_left = startP + topleft;
-			//QPoint global_start_point = global_top_left -offset;
-			//if (global_start_point.x()<0)
-			//{
-			//	auto offset_x = global_start_point.x(); //负数
-			//	global_start_point.setX(0);
-			//	offset.setX(offset.x() + offset_x);
-			//}
-			//else if (global_start_point.x() + scene_width >= tiffWidth)
-			//{
-			//	auto offset_x = global_start_point.x();
-			//	global_start_point.setX(tiffWidth - scene_width - 1);
-			//	offset_x = global_start_point.x() - offset_x; //负数
-			//	offset.setX(offset.x() - offset_x);
-			//}
-			//if (global_start_point.y()<0)
-			//{
-			//	auto offset_y = global_start_point.y();
-			//	global_start_point.setY(0);
-			//	offset.setY(offset.y() + offset_y);
-			//}
-			//else if (global_start_point.y() + scene_height >= tiffHeight){
-			//	auto offset_y = global_start_point.y();
-			//	global_start_point.setY(tiffHeight - scene_height - 1);
-			//	offset_y = global_start_point.y() - offset_y;
-			//	offset.setY(offset.y() - offset_y);
-			//}
+			QPoint offset(scene_width / 2, scene_height / 2);
+			global_start_point -= offset;
+			if (global_start_point.x()<0)
+			{
+				auto offset_x = global_start_point.x(); //负数
+				global_start_point.setX(0);
+				offset.setX(offset.x() + offset_x);
+			}
+			else if (global_start_point.x() + scene_width >= tiffWidth)
+			{
+				auto offset_x = global_start_point.x();
+				global_start_point.setX(tiffWidth - scene_width - 1);
+				offset_x = global_start_point.x() - offset_x; //负数
+				offset.setX(offset.x() - offset_x);
+			}
+			if (global_start_point.y()<0)
+			{
+				auto offset_y = global_start_point.y();
+				global_start_point.setY(0);
+				offset.setY(offset.y() + offset_y);
+			}
+			else if (global_start_point.y() + scene_height >= tiffHeight){
+				auto offset_y = global_start_point.y();
+				global_start_point.setY(tiffHeight - scene_height - 1);
+				offset_y = global_start_point.y() - offset_y;
+				offset.setY(offset.y() - offset_y);
+			}
 			GraphicsRectItem* item = new GraphicsRectItem(global_start_point, penType);
 
 			//item->localTopLeft = topleft;
@@ -986,18 +986,13 @@ void BiomakerTool::writeFile(QVector<GraphicsRectItem*>& rectItems, QString qfil
 			QRect captureRect = rectItems[i]->rect().toAlignedRect();
 
 			if (rectItems[i]->localTopLeft != QPoint(-1,-1))
-				//Debug 20190416
-				//outfile << rectItems[i]->startPoint.x()<<" "<<rectItems[i]->startPoint.y()
-				//	<< " " << rectItems[i]->localTopLeft.x() << " " << rectItems[i]->localTopLeft.y() << " " << captureRect.width() << " " << captureRect.height() << endl;
 				outfile << rectItems[i]->startPoint.x() + rectItems[i]->localTopLeft.x()* rectItems[i]->originScale << " "
-			<< rectItems[i]->startPoint.y() + rectItems[i]->localTopLeft.y()* rectItems[i]->originScale
-					<< " " << 0 << " " << 0 << " "
-			<< captureRect.width() * rectItems[i]->originScale << " " << captureRect.height() * rectItems[i]->originScale << endl;
+						<< rectItems[i]->startPoint.y() + rectItems[i]->localTopLeft.y()* rectItems[i]->originScale	<< " "
+						<< 0 << " " << 0 << " "
+						<< captureRect.width() * rectItems[i]->originScale << " " 
+						<< captureRect.height() * rectItems[i]->originScale << endl;
 
 			else {
-				//Debug 20190416
-				//outfile << rectItems[i]->startPoint.x() << " " << rectItems[i]->startPoint.y()
-				//	<< " " << captureRect.topLeft().x() << " " << captureRect.topLeft().y() << " " << captureRect.width() << " " << captureRect.height() << endl;
 				outfile << rectItems[i]->startPoint.x() + captureRect.topLeft().x()* rectItems[i]->originScale << " "
 				<< rectItems[i]->startPoint.y() + captureRect.topLeft().y()* rectItems[i]->originScale
 						<< " " << 0 << " " << 0 << " "
@@ -1442,6 +1437,8 @@ void BiomakerTool::on_slotOpenImage_triggered(){
 	QPoint centerPoint = QPoint(tiffWidth / 2 - 1, tiffHeight / 2 - 1);
 	QPoint startPoint = centerPoint - QPoint(sceneWidth / 2 - 1, sceneHeight / 2 - 1);
 	
+	zt = 4;
+	emit sendZTtoLocalView(4);
 	setShowImage(startPoint);
 
 	//set global view
@@ -1476,7 +1473,6 @@ void BiomakerTool::setShowImage(QPointF startPoint) {
 
 	const QImage swapImage = bufImg->rgbSwapped();
 	//bufImg->invertPixels();
-	//qDebug() << starttime.elapsed() << endl;
 	local_graphics_view->updateImage(startPoint.toPoint(), QPixmap::fromImage(swapImage));
 	local_graphics_view->show();
 }
@@ -1493,8 +1489,8 @@ void BiomakerTool::setNavigationChoosedImage(QPointF localPoint) {
 	globalPoint.setY(y);
 
 	curStartPoint = globalPoint;
-	zt = 1;	// 缩放需要重置
-	emit sendZTtoLocalView(1);
+	zt = 4;	// 缩放需要重置
+	emit sendZTtoLocalView(4);
 	
 	//qDebug() << navigationWidth*1.0f / tiffWidth << navigationHeight*1.0f/tiffHeight << localPoint << globalPoint;
 	if (tiffBoundingBox.contains(QRect(globalPoint, QSize(sceneWidth, sceneHeight)))){
