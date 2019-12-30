@@ -181,13 +181,13 @@ void LocalGraphicsView::keyPressEvent(QKeyEvent *event)
 		//translate(QPointF(2, 0));  // 右移
 		moveOffset = QPoint(xOffset, 0);
 		break;
-	case Qt::Key_Plus:  // 放大	键盘 'shift' + '+'
-		zoomIn();
-		break;
-	case Qt::Key_Minus:  // 缩小 键盘 '-'
-		zoomOut();
-		break;
-	case Qt::Key_Space:  // 逆时针旋转
+	//case Qt::Key_Plus:  // 放大	键盘 'shift' + '+'
+	//	zoomIn();
+	//	break;
+	//case Qt::Key_Minus:  // 缩小 键盘 '-'
+	//	zoomOut();
+	//	break;
+	//case Qt::Key_Space:  // 逆时针旋转
 		//rotate(-5);
 		//break;
 	//回车控制提交绘制的polygon
@@ -225,7 +225,6 @@ void LocalGraphicsView::keyPressEvent(QKeyEvent *event)
 
 				emit sendMakerNumber(zoomOutMakerNumber, zoomInMakerNumber);
 			}
-
 
 			int selectedRectPenIndex = selectedRectItem->penType;
 			if (selectedRectPenIndex == 1 && redLabelNumber>=1) {
@@ -370,7 +369,7 @@ void LocalGraphicsView::keyReleaseEvent(QKeyEvent *event)
 	default:
 		QGraphicsView::keyPressEvent(event);
 	}
-	std::cout << is_control_key_push << std::endl;
+	//std::cout << is_control_key_push << std::endl;
 }
 
 QRect LocalGraphicsView::getRect(const QPointF &beginPoint, const QPointF& endPoint)
@@ -393,17 +392,16 @@ QRect LocalGraphicsView::getRect(const QPointF &beginPoint, const QPointF& endPo
 	return selectedRect;
 
 }
+
 // 平移
-void LocalGraphicsView::mouseMoveEvent(QMouseEvent *event)
-{
+void LocalGraphicsView::mouseMoveEvent(QMouseEvent *event) {
 	if (event->buttons() & Qt::LeftButton) {
 		m_lastMousePos = event->pos();
 		QPoint moveOffset = m_lastMousePos - oldPoint;
 
 		//拉近视角时将移速降低2倍
-		if (isZoomIn) {
+		if (isZoomIn)
 			moveOffset /= 2;
-		}
 
 		QRect sceneRect = QRect(QPoint(startPoint - moveOffset), QSize(sceneWidth, sceneHeight));
 		if (tiffRec.contains(sceneRect)) {
@@ -615,9 +613,7 @@ void LocalGraphicsView::mousePressEvent(QMouseEvent *event) {
 void LocalGraphicsView::localPloygonMousePressEvent(QMouseEvent *event)
 {
 	if (event->buttons() & Qt::RightButton) {
-
-		if(polygon_region.empty())
-		{
+		if(polygon_region.empty()) {
 			start_point = event->pos();
 			cur_ploygon = new QGraphicsPathItem();
 			//ploygon_items.push_back(cur_ploygon);
@@ -668,57 +664,57 @@ void LocalGraphicsView::mouseReleaseEvent(QMouseEvent *event)
 void LocalGraphicsView::wheelEvent(QWheelEvent *event) {
 	
 	// 滚轮的滚动量
-	QPoint scrollAmount = event->angleDelta();
+	const QPoint scrollAmount = event->angleDelta();
 	// 正值表示滚轮远离使用者（放大），负值表示朝向使用者（缩小）
 	if (scrollAmount.y() > 0)
 		emit sendWheelUpState(true);
 	else
 		emit sendWheelUpState(false);
 }
-
-// 放大 
-void LocalGraphicsView::zoomIn()
-{
-	return;
-	zoom(1 + m_zoomDelta);
-}
-
-// 缩小
-void LocalGraphicsView::zoomOut()
-{
-	return;
-	zoom(1 - m_zoomDelta);
-}
-
-// 缩放 - scaleFactor：缩放的比例因子
-void LocalGraphicsView::zoom(float scaleFactor)
-{
-	//return;
-	// 防止过小或过大
-	qreal factor = transform().scale(scaleFactor, scaleFactor).mapRect(QRectF(0, 0, 1, 1)).width();
-	if (factor < 0.07 || factor > 100)
-		return;
-
-	scale(scaleFactor, scaleFactor);
-	m_scale *= scaleFactor;
-}
-
-// 平移
-void LocalGraphicsView::translate(QPointF delta)
-{
-	return;
-	// 根据当前 zoom 缩放平移数
-	delta *= m_scale;
-	delta *= m_translateSpeed;
-
-	// view 根据鼠标下的点作为锚点来定位 scene
-	setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
-	QPoint newCenter(tiffWidth / 2 - delta.x(), tiffWidth / 2 - delta.y());
-	centerOn(mapToScene(newCenter));
-
-	// scene 在 view 的中心点作为锚点
-	setTransformationAnchor(QGraphicsView::AnchorViewCenter);
-}
+//
+//// 放大 
+//void LocalGraphicsView::zoomIn()
+//{
+//	return;
+//	zoom(1 + m_zoomDelta);
+//}
+//
+//// 缩小
+//void LocalGraphicsView::zoomOut()
+//{
+//	return;
+//	zoom(1 - m_zoomDelta);
+//}
+//
+//// 缩放 - scaleFactor：缩放的比例因子
+//void LocalGraphicsView::zoom(float scaleFactor)
+//{
+//	//return;
+//	// 防止过小或过大
+//	qreal factor = transform().scale(scaleFactor, scaleFactor).mapRect(QRectF(0, 0, 1, 1)).width();
+//	if (factor < 0.07 || factor > 100)
+//		return;
+//
+//	scale(scaleFactor, scaleFactor);
+//	m_scale *= scaleFactor;
+//}
+//
+//// 平移
+//void LocalGraphicsView::translate(QPointF delta)
+//{
+//	return;
+//	// 根据当前 zoom 缩放平移数
+//	delta *= m_scale;
+//	delta *= m_translateSpeed;
+//
+//	// view 根据鼠标下的点作为锚点来定位 scene
+//	setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+//	QPoint newCenter(tiffWidth / 2 - delta.x(), tiffWidth / 2 - delta.y());
+//	centerOn(mapToScene(newCenter));
+//
+//	// scene 在 view 的中心点作为锚点
+//	setTransformationAnchor(QGraphicsView::AnchorViewCenter);
+//}
 
 void LocalGraphicsView::circleMouseMoveEvent(QMouseEvent* event) {
 	//qDebug() << "LocalGraphicsView::circleMouseMoveEvent";

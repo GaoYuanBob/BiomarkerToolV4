@@ -56,7 +56,7 @@ public:
 protected:
 	// 上/下/左/右键向各个方向移动、加/减键进行缩放、空格/回车键旋转
 	void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
-	void keyReleaseEvent(QKeyEvent* event) override;
+	void keyReleaseEvent(QKeyEvent* event) Q_DECL_OVERRIDE;
 	// 平移
 	void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 	void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
@@ -111,11 +111,13 @@ public slots:
 		emit sendPenType(penIndex);
 		update();
 	}
-	public slots:
-	void zoomIn();  // 放大
-	void zoomOut();  // 缩小
-	void zoom(float scaleFactor); // 缩放 - scaleFactor：缩放的比例因子
-	void translate(QPointF delta);  // 平移
+	
+public slots:
+	//void zoomIn();  // 放大
+	//void zoomOut();  // 缩小
+	//void zoom(float scaleFactor); // 缩放 - scaleFactor：缩放的比例因子
+	//void translate(QPointF delta);  // 平移
+	//
 	void circleMouseMoveEvent(QMouseEvent* event);
 	void circleMousePressEvent(QMouseEvent* event);
 	
@@ -130,15 +132,13 @@ public slots:
 	void ploygonMouseReleaseEvent(QMouseEvent* event);
 
 	void setCircleDrawState(bool state) { this->is_circle_draw = state; }
-	
 	void setRegionState(bool state) { this->is_region_painting_set = state; }
-
 	void getRemovePolygon(QGraphicsPathItem* item);
 	void setNewPolygon(QPainterPath painter_path, double factor);
 	void setNewPolygon(QPainterPath painter_path, double width_factor, double height_factor);
 	void setNewPolygonFromGlobalGraphicsView(QGraphicsPathItem*& item);
 
-	Q_SIGNALS:
+Q_SIGNALS:
 	void startPointChanged(QPointF);
 	void sendWheelUpState(bool);
 	void sendZoomInState(bool);
@@ -159,6 +159,7 @@ public slots:
 	void sendPolygon(QGraphicsPathItem* cur_ploygon, const QPoint& point);
 	void sendCircle(QGraphicsEllipseItem* cur_circle, const QPoint& point);
 	void sendLocalPolygon(const QVector<QPointF>& vector, QGraphicsPathItem* path_item);
+	
 private:
 	Qt::MouseButton m_translateButton;  // 平移按钮
 	qreal m_translateSpeed;  // 平移速度
@@ -166,12 +167,10 @@ private:
 	bool m_bMouseTranslate;  // 平移标识
 	QPoint m_lastMousePos;  // 鼠标最后按下的位置
 	qreal m_scale;  // 缩放值
-	int tiffWidth;
-	int tiffHeight;
-	int sceneWidth;
-	int sceneHeight;
-	int xOffset = 20;
-	int yOffset = 20;
+	
+	int tiffWidth, tiffHeight;
+	int sceneWidth, sceneHeight;
+	int xOffset = 20, yOffset = 20;
 	
 	QPoint oldPoint;
 	
@@ -182,8 +181,7 @@ private:
 	QPoint oldStartPoint;
 	QPixmap *oldPixmap;
 	QGraphicsPixmapItem *pixmapItem;
-	QPoint dragStartPoint;
-	QPoint dragEndPoint;
+	QPoint dragStartPoint, dragEndPoint;
 	QPointF selectedRectTopLeft;
 	QPoint oldBuf;
 	bool isRectSeleted;
@@ -194,16 +192,8 @@ private:
 	
 	int penIndex;
 
-	QPen redPen;
-	QPen greenPen;
-	QPen bluePen;
-	QPen yellowPen;
-	QPen blackPen;
-	QPen redDotPen;
-	QPen greenDotPen;
-	QPen blueDotPen;
-	QPen yellowDotPen;
-	QPen blackDotPen;
+	QPen redPen, greenPen, bluePen, yellowPen, blackPen;
+	QPen redDotPen, greenDotPen, blueDotPen, yellowDotPen, blackDotPen;
 
 	int navigationWindowWidth;
 	int navigationWindowHeight;
@@ -216,25 +206,22 @@ private:
 	QMap<QGraphicsEllipseItem*, int> circle_number_map;
 
 	QPainterPath cur_paint_path;
-	QGraphicsPathItem* cur_ploygon;
-	QGraphicsPathItem* selected_ploygon;
+	QGraphicsPathItem *cur_ploygon, *selected_ploygon;
+	QGraphicsEllipseItem *cur_circle, *selected_circle;
+	
 	int point_count = 0;
 	QPointF start_point;
 	bool is_ploygon_selected;
 	int clicked_polygon_type;
 
-
 	bool is_circle_draw = false;
 	QList<QGraphicsEllipseItem*> circle_items;
-	QGraphicsEllipseItem* cur_circle;
-	QGraphicsEllipseItem* selected_circle;
 	QPen circle_pen;
 	QBrush circle_brush;
 	bool is_circle_selected;
 
 	int mouse_button_type = -1;
-	QPointF old_top_left;
-	QPointF old_point;
+	QPointF old_top_left, old_point;
 
 	//Debug 20190726
 	bool is_region_painting_set = false;
@@ -243,12 +230,7 @@ private:
 public:
 	QGraphicsScene* graphicsScene;
 	QPoint startPoint;
-	QVector<QVector<int>> zoomOutMakerNumber[5];
-	QVector<QVector<int>> zoomInMakerNumber[5];
+	QVector<QVector<int>> zoomOutMakerNumber[5], zoomInMakerNumber[5];
 
-	int redLabelNumber = 0;
-	int greenLabelNumber = 0;
-	int blueLabelNumber = 0;
-	int yellowLabelNumber = 0;
-	int blackLabelNumber = 0;
+	int redLabelNumber = 0, greenLabelNumber = 0, blueLabelNumber = 0, yellowLabelNumber = 0, blackLabelNumber = 0;
 };

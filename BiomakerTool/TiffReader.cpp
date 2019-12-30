@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <iostream>
 
 TiffReader::TiffReader(QString filename) {
 	tif = TIFFOpen(filename.toStdString().c_str(), "r");

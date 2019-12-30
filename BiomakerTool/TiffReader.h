@@ -1,7 +1,6 @@
 #pragma once
 #include "tiffio.h"
 #include <QString>
-#include <iostream>
 #include <QImage>
 
 class TiffReader {
@@ -20,6 +19,7 @@ public:
 	double getGlobalFactor() const { return global_factor; }
 	double getGlobalWidthFactor() const { return global_width_factor; }
 	double getGlobalHeightFactor() const { return global_height_factor; }
+	
 private:
 	TIFF* tif;
 	uint32 imageWidth, imageLength, TileWidth, TileLength, imageRowsPerStrip;
