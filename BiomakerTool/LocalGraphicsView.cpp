@@ -73,9 +73,11 @@ void LocalGraphicsView::updateImage(QPoint startP, QPixmap& pixmap) {
 		minZvalue = qMin(item->zValue(), minZvalue);
 		if (item->type() == GraphicsRectItem::Type) {
 			GraphicsRectItem *rect = qgraphicsitem_cast<GraphicsRectItem*>(item);
-			QPoint offset = (oldStartPoint - startP);
-			if (this->startPoint != startP)
+			QPoint offset = (oldStartPoint - this->startPoint);
+			if (this->startPoint != startP) {
+				offset = (this->startPoint - startP);
 				printf("startPoint != startP\n");
+			}
 
 			// 每次左键松开鼠标，rect->pos()就变成了(0, 0)
 			//qDebug() << "rect->pos() = " << rect->pos();
@@ -472,11 +474,6 @@ void LocalGraphicsView::mousePressEvent(QMouseEvent *event) {
 					rectItem->setPen(getOldPen(rectItem));
 			}
 		}
-		//if (isRectSeleted) {
-		//	selectedRectItem->setPen(getOldPen(selectedRectItem));
-		//	isRectSeleted = false;
-		//}
-
 		if (!isRectHad)
 			isRectSeleted = false;
 		oldPoint = event->pos();
@@ -492,25 +489,7 @@ void LocalGraphicsView::mousePressEvent(QMouseEvent *event) {
 		rectItem = new GraphicsRectItem(startPoint, penIndex);
 		rectItem->setPen(getPen(penIndex));
 		graphicsScene->addItem(rectItem);
-
-		
-		//if (isZoomIn) {
-		//	rectTopLeft = event->pos();
-		//	rectTopLeft = rectTopLeft / 2 + QPoint(sceneWidth / 4, sceneHeight / 4);
-		//	rectItem = new GraphicsRectItem(startPoint, penIndex);
-		//	rectItem->setPen(getPen(penIndex));
-		//	graphicsScene->addItem(rectItem);
-		//}
-		//else {
-		//	// startPoint 是绘制窗口的左上角在TIFF图像中的位置
-		//	// rectTopLeft 是画的框左上角在窗口中相对于窗口左上角的位置，两个相加就是框的左上角在TIFF图像中的位置
-		//	rectTopLeft = event->pos();
-		//	rectItem = new GraphicsRectItem(startPoint, penIndex);
-		//	rectItem->setPen(getPen(penIndex));
-		//	graphicsScene->addItem(rectItem);
-		//}
 	}
-
 	QGraphicsView::mousePressEvent(event);
 }
 
