@@ -6,7 +6,7 @@
 ## 操作方法
 分为LocalView和GlobalView；\
 LocalView下：\
-&emsp;&emsp;可以使用加减号进行缩放，`'shift'` + `'+'` 可以进行放大，`'-'` 进行缩小。\
+&emsp;&emsp;可以使用加减号进行缩放，`'shift'` + `'+'` 可以进行放大，`'-'` 进行缩小（不推荐使用）。\
 &emsp;&emsp;Zoomin 和 Zoomout 功能可以实现方法两倍和还原功能。\
 &emsp;&emsp;使用滚轮可以进行缩放，最多缩小8倍，最小就是默认状态，即为和TIFF图像同样的分辨率。
 
